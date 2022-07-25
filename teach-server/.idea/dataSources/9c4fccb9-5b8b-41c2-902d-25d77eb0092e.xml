@@ -1,59 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="gobang@bj-cdb-koq9r5sw.sql.tencentcdb.com">
-  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.31">
-    <root id="1">
-      <DefaultCasing>exact</DefaultCasing>
-      <DefaultEngine>InnoDB</DefaultEngine>
-      <DefaultTmpEngine>InnoDB</DefaultTmpEngine>
-      <Grants>|root||root||ALTER|G
-|root||root||ALTER ROUTINE|G
-|root||root||APPLICATION_PASSWORD_ADMIN|G
-|root||mysql.session|localhost|BACKUP_ADMIN|G
-|root||mysql.session|localhost|CLONE_ADMIN|G
-|root||mysql.session|localhost|CONNECTION_ADMIN|G
-|root||root||CREATE|G
-|root||root||CREATE ROLE|G
-|root||root||CREATE ROUTINE|G
-|root||root||CREATE TABLESPACE|G
-|root||root||CREATE TEMPORARY TABLES|G
-|root||root||CREATE USER|G
-|root||root||CREATE VIEW|G
-|root||root||DELETE|G
-|root||root||DROP|G
-|root||root||DROP ROLE|G
-|root||root||EVENT|G
-|root||root||EXECUTE|G
-|root||root||INDEX|G
-|root||root||INNODB_REDO_LOG_ENABLE|G
-|root||root||INSERT|G
-|root||root||LOCK TABLES|G
-|root||mysql.session|localhost|PERSIST_RO_VARIABLES_ADMIN|G
-|root||root||PROCESS|G
-|root||root||REFERENCES|G
-|root||root||RELOAD|G
-|root||root||REPLICATION CLIENT|G
-|root||root||REPLICATION SLAVE|G
-|root||root||ROLE_ADMIN|G
-|root||mysql.infoschema|localhost|SELECT|G
-|root||root||SELECT|G
-|root||mysql.session|localhost|SESSION_VARIABLES_ADMIN|G
-|root||root||SHOW DATABASES|G
-|root||root||SHOW VIEW|G
-|root||root||SHOW_ROUTINE|G
-|root||mysql.session|localhost|SHUTDOWN|G
-|root||mysql.session|localhost|SUPER|G
-|root||mysql.infoschema|localhost|SYSTEM_USER|G
-|root||mysql.session|localhost|SYSTEM_USER|G
-|root||mysql.sys|localhost|SYSTEM_USER|G
-|root||mysql.session|localhost|SYSTEM_VARIABLES_ADMIN|G
-|root||root||TRIGGER|G
-|root||root||UPDATE|G
-|root||root||XA_RECOVER_ADMIN|G
-|root||root||grant option|G
-performance_schema|schema||mysql.session|localhost|SELECT|G
-sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
-      <ServerVersion>8.0.22</ServerVersion>
-    </root>
+  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.32">
+    <root id="1"/>
     <collation id="2" parent="1" name="armscii8_bin">
       <Charset>armscii8</Charset>
     </collation>
@@ -912,26 +860,26 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Charset>utf8mb4</Charset>
     </collation>
     <schema id="274" parent="1" name="__cdb_recycle_bin__">
-      <Collation>utf8mb4_0900_ai_ci</Collation>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="275" parent="1" name="acmlab">
-      <Collation>utf8_bin</Collation>
+      <CollationName>utf8_bin</CollationName>
     </schema>
     <schema id="276" parent="1" name="gobang">
-      <Collation>utf8_bin</Collation>
       <Current>1</Current>
+      <CollationName>utf8_bin</CollationName>
     </schema>
     <schema id="277" parent="1" name="information_schema">
-      <Collation>utf8_general_ci</Collation>
+      <CollationName>utf8_general_ci</CollationName>
     </schema>
     <schema id="278" parent="1" name="mysql">
-      <Collation>utf8mb4_0900_ai_ci</Collation>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="279" parent="1" name="performance_schema">
-      <Collation>utf8mb4_0900_ai_ci</Collation>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="280" parent="1" name="sys">
-      <Collation>utf8mb4_0900_ai_ci</Collation>
+      <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="281" parent="1" name="mysql.infoschema">
       <Host>localhost</Host>
