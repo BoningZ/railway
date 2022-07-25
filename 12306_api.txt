@@ -1,0 +1,6 @@
+车站：https://kyfw.12306.cn/otn/resources/js/framework/station_name.js
+
+
+new 车次：https://search.12306.cn/search/v1/train/search?keyword=G&date=20220705
+new 时刻表 https://kyfw.12306.cn/otn/queryTrainInfo/query?leftTicketDTO.train_no=24000000G100&leftTicketDTO.train_date=2022-07-05&rand_code=0
+
