@@ -22,7 +22,7 @@ public class Currency {
 
     @JoinColumn(name = "to_rmb")
     @NotBlank
-    private double toRMB;
+    private double toRmb;
 
     public String getId() {
         return id;
@@ -40,11 +40,11 @@ public class Currency {
         this.name = name;
     }
 
-    public double getToRMB() {
-        return toRMB;
+    public double getToRmb() {
+        return toRmb;
     }
 
-    public void setToRMB(double toRMB) {
-        this.toRMB = toRMB;
+    public void setToRmb(double toRmb) {
+        this.toRmb = toRmb;
     }
 }
