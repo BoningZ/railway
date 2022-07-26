@@ -5,18 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ProvinceDAO {
-    public void inject(String id,String name,String country){
+public class DistrictDAO {
+    public void inject(String id,String name,String city){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "insert into province values(?,?,?)";
+            String sql = "insert into district values(?,?,?)";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             preparedStatement.setString(2,name);
-            preparedStatement.setString(3,country);
+            preparedStatement.setString(3,city);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -25,6 +25,7 @@ public class ProvinceDAO {
             JDBCUtils.close(preparedStatement,connection);
         }
     }
+
     public boolean existById(String id){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -32,7 +33,7 @@ public class ProvinceDAO {
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "select * from province where id=?";
+            String sql = "select * from district where id=?";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             resultSet=preparedStatement.executeQuery();
