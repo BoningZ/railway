@@ -45,4 +45,12 @@ public class ProvinceDAO {
         }
         return false;
     }
+    public void reInject(String id,String name,String country){
+        if(existById(id)){
+            System.out.println(id+":"+name+" already injected!");
+            return;
+        }
+        System.out.println("injecting: "+id+":"+name);
+        inject(id,name,country);
+    }
 }
