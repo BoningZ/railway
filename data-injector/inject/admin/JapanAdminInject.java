@@ -1,4 +1,4 @@
-package inject;
+package inject.admin;
 
 import DAO.CityDAO;
 import DAO.DistrictDAO;
