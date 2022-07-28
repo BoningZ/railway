@@ -70,6 +70,30 @@ public class CityDAO {
         return false;
     }
 
+    public String findIdByName(String name){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from city where name=?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(1,name);
+            resultSet=preparedStatement.executeQuery();
+            if(resultSet.next())
+                return resultSet.getString("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return null;
+    }
+
+
+
     public void reInject(String id,String name,String country){
         if(existById(id)){
             System.out.println(id+":"+name+" already injected!");
