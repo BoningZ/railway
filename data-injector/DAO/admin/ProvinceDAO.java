@@ -1,22 +1,24 @@
-package DAO;
+package DAO.admin;
+
+import DAO.JDBCUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CityDAO {
-    public void inject(String id,String name,String province){
+public class ProvinceDAO {
+    public void inject(String id,String name,String country){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "insert into city values(?,?,?)";
+            String sql = "insert into province values(?,?,?)";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             preparedStatement.setString(2,name);
-            preparedStatement.setString(3,province);
+            preparedStatement.setString(3,country);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -25,7 +27,6 @@ public class CityDAO {
             JDBCUtils.close(preparedStatement,connection);
         }
     }
-
     public boolean existById(String id){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -33,7 +34,7 @@ public class CityDAO {
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "select * from city where id=?";
+            String sql = "select * from province where id=?";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             resultSet=preparedStatement.executeQuery();
@@ -46,7 +47,6 @@ public class CityDAO {
         }
         return false;
     }
-
     public void reInject(String id,String name,String country){
         if(existById(id)){
             System.out.println(id+":"+name+" already injected!");

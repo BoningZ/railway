@@ -1,22 +1,24 @@
-package DAO;
+package DAO.admin;
+
+import DAO.JDBCUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DistrictDAO {
-    public void inject(String id,String name,String city){
+public class CityDAO {
+    public void inject(String id,String name,String province){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "insert into district values(?,?,?)";
+            String sql = "insert into city values(?,?,?)";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             preparedStatement.setString(2,name);
-            preparedStatement.setString(3,city);
+            preparedStatement.setString(3,province);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -26,6 +28,27 @@ public class DistrictDAO {
         }
     }
 
+    public String getIdByName(String name){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from city where name like ?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(1,name+"%");
+            resultSet=preparedStatement.executeQuery();
+            if(resultSet.next())return resultSet.getString("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return null;
+    }
+
     public boolean existById(String id){
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -33,7 +56,7 @@ public class DistrictDAO {
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "select * from district where id=?";
+            String sql = "select * from city where id=?";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
             preparedStatement.setString(1,id);
             resultSet=preparedStatement.executeQuery();

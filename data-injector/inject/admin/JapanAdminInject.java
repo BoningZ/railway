@@ -1,14 +1,13 @@
 package inject.admin;
 
-import DAO.CityDAO;
-import DAO.DistrictDAO;
-import DAO.ProvinceDAO;
+import DAO.admin.CityDAO;
+import DAO.admin.DistrictDAO;
+import DAO.admin.ProvinceDAO;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import com.alibaba.fastjson.*;
