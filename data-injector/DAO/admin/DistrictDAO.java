@@ -56,9 +56,9 @@ public class DistrictDAO {
 
         try {
             connection = JDBCUtils.getconn();
-            String sql = "select * from district where name=?";
+            String sql = "select * from district where name like ?";
             preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
-            preparedStatement.setString(1,name);
+            preparedStatement.setString(1,name+"%");
             resultSet=preparedStatement.executeQuery();
             if(resultSet.next())
                 return resultSet.getString("city_id");
