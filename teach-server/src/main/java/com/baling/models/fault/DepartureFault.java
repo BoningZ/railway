@@ -28,7 +28,7 @@ public class DepartureFault {
     @JoinColumn(name = "fault_id")
     private Fault fault;
 
-    private java.sql.Time delay;
+    private int delay;
 
     public int getId() {
         return id;
@@ -62,11 +62,11 @@ public class DepartureFault {
         this.fault = fault;
     }
 
-    public Time getDelay() {
+    public int getDelay() {
         return delay;
     }
 
-    public void setDelay(Time delay) {
+    public void setDelay(int delay) {
         this.delay = delay;
     }
 }

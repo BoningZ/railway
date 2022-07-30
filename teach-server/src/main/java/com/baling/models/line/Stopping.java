@@ -28,10 +28,10 @@ public class Stopping {
     private int orderInLine;
 
     @NotBlank
-    private java.sql.Time arrival;
+    private int arrival;
 
     @NotBlank
-    private java.sql.Time stay;
+    private int stay;
 
     @NotBlank
     private double constant;
@@ -68,19 +68,19 @@ public class Stopping {
         this.orderInLine = orderInLine;
     }
 
-    public Time getArrival() {
+    public int getArrival() {
         return arrival;
     }
 
-    public void setArrival(Time arrival) {
+    public void setArrival(int arrival) {
         this.arrival = arrival;
     }
 
-    public Time getStay() {
+    public int getStay() {
         return stay;
     }
 
-    public void setStay(Time stay) {
+    public void setStay(int stay) {
         this.stay = stay;
     }
 

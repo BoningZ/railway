@@ -19,6 +19,11 @@ public class Train {
 
     private int speed;
 
+    @ManyToOne
+    @JoinColumn(name = "train_type_id")
+    @NotBlank
+    private TrainType trainType;
+
     public String getId() {
         return id;
     }
@@ -41,5 +46,13 @@ public class Train {
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public TrainType getTrainType() {
+        return trainType;
+    }
+
+    public void setTrainType(TrainType trainType) {
+        this.trainType = trainType;
     }
 }

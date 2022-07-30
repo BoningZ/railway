@@ -88,6 +88,28 @@ public class StationDAO {
         return false;
     }
 
+    public String findIdByNameCN(String name){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from station where name=? and id like ?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(2,"CN%");
+            preparedStatement.setString(1,name);
+            resultSet=preparedStatement.executeQuery();
+            if(resultSet.next())return resultSet.getString("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return null;
+    }
+
     public void editPosition(){
         Connection connection = null;
         PreparedStatement preparedStatement = null;

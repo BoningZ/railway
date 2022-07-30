@@ -20,7 +20,7 @@ public class Departure {
     private Line line;
 
     @NotBlank
-    private java.sql.Time start;
+    private int start;
 
     @NotBlank
     private int schedule;
@@ -46,11 +46,11 @@ public class Departure {
         this.line = line;
     }
 
-    public Time getStart() {
+    public int getStart() {
         return start;
     }
 
-    public void setStart(Time start) {
+    public void setStart(int start) {
         this.start = start;
     }
 
