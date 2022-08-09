@@ -5,8 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "coach_seat",
-uniqueConstraints = @UniqueConstraint(columnNames = {"coach_id","seat_id"}))
+@Table(name = "coach_seat")
 public class CoachSeat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

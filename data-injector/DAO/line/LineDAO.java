@@ -20,10 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class LineDAO {
     public void inject(String id,String name,String train_id,String company_id,boolean is_regular){
@@ -46,6 +43,51 @@ public class LineDAO {
         finally{
             JDBCUtils.close(preparedStatement,connection);
         }
+    }
+
+    public String getNameById(String id){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from line where id=?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(1,id);
+            resultSet=preparedStatement.executeQuery();
+            if(resultSet.next())return resultSet.getString("name");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return null;
+    }
+
+    public List<String> getKRLine(){
+        List<String> res=new ArrayList<>();
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from line where id like ?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(1,"KR%");
+            resultSet=preparedStatement.executeQuery();
+            while(resultSet.next())res.add(resultSet.getString("id").substring(3));
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return res;
     }
 
     public boolean existById(String id){

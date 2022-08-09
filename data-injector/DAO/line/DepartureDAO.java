@@ -3,6 +3,8 @@ package DAO.line;
 import DAO.JDBCUtils;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DepartureDAO {
     public void inject(String id, int schedule, int start,String lineId,String driverId){
@@ -25,6 +27,30 @@ public class DepartureDAO {
         finally{
             JDBCUtils.close(preparedStatement,connection);
         }
+    }
+
+    public List<String> getRestJP(){
+        List<String> res=new ArrayList<>();
+
+            Connection connection = null;
+            PreparedStatement preparedStatement = null;
+            ResultSet resultSet=null;
+
+            try {
+                connection = JDBCUtils.getconn();
+                String sql = "select * from line where id not in (select line_id from departure) and id like ?";
+                preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+                preparedStatement.setString(1,"JP%");
+                resultSet=preparedStatement.executeQuery();
+                while(resultSet.next())res.add(resultSet.getString("id"));
+                return res;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            finally{
+                JDBCUtils.close(preparedStatement,connection);
+            }
+            return res;
     }
 
 

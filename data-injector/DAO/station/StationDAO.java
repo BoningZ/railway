@@ -14,11 +14,42 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class StationDAO {
+
+    public double getDistance(String id1,String id2) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        double lat1 = 0, lat2 = 0, lon1 = 0, lon2 = 0;
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from station where id=?";
+            preparedStatement = (PreparedStatement) connection.prepareStatement(sql);
+            preparedStatement.setString(1, id1);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                lat1 = resultSet.getDouble("lat"); lon1=resultSet.getDouble("lon");
+            }
+            String sql2 = "select * from station where id=?";
+            preparedStatement = (PreparedStatement) connection.prepareStatement(sql2);
+            preparedStatement.setString(1, id2);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                lat2 = resultSet.getDouble("lat"); lon2=resultSet.getDouble("lon");
+            }
+            if(lon1*lat1*lon2*lat2==0||100*Math.sqrt((lon1-lon2)*(lon1-lon2)+(lat1-lat2)*(lat1-lat2))>1000)return 2.5;
+            return 100*Math.sqrt((lon1-lon2)*(lon1-lon2)+(lat1-lat2)*(lat1-lat2));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            JDBCUtils.close(preparedStatement, connection);
+        }
+        return 0;
+
+    }
 
     public void inject(String id,String name,double lon,double lat,double timezone,String transfer_id,String city_id){
         Connection connection = null;
@@ -42,6 +73,28 @@ public class StationDAO {
         finally{
             JDBCUtils.close(preparedStatement,connection);
         }
+    }
+    public List<String> getAllKorea(){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet=null;
+        List<String> res=new ArrayList<>();
+
+        try {
+            connection = JDBCUtils.getconn();
+            String sql = "select * from station where id like ?";
+            preparedStatement = (PreparedStatement)connection.prepareStatement(sql);
+            preparedStatement.setString(1,"KR%");
+            resultSet=preparedStatement.executeQuery();
+            while(resultSet.next())res.add(resultSet.getString("name"));
+            return res;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        finally{
+            JDBCUtils.close(preparedStatement,connection);
+        }
+        return res;
     }
 
 
@@ -179,7 +232,9 @@ public class StationDAO {
             resultSet=preparedStatement.executeQuery();
             while(resultSet.next()){
                 String id=resultSet.getString("id");
-                String addr=infos.get(id.substring(3))[8],city=null,cityId=null;
+                String[] info=infos.get(id.substring(3));
+                String addr=info[8],city=null,cityId=null;
+                String name=info[2]; double lon=Double.parseDouble(info[9]),lat=Double.parseDouble(info[10]);String transferId=info[1];
                 if(addr.indexOf('市')!=-1) {
                     if(addr.indexOf("県")+1<addr.indexOf("市")+1&& addr.contains("県"))
                         city = addr.substring(addr.indexOf("県")+1, addr.indexOf("市")+1);
@@ -213,10 +268,14 @@ public class StationDAO {
 
                 System.out.println("addr:"+addr+" id:"+id+" city:"+city+" cityId:"+cityId);
 
-                String update="update station set city_id=? where id=?";
+                String update="update station set city_id=?,name=?,lon=?,lat=?,transfer_id=? where id=?";
                 preparedStatement=connection.prepareStatement(update);
                 preparedStatement.setString(1,cityId);
-                preparedStatement.setString(2,id);
+                preparedStatement.setString(2,name);
+                preparedStatement.setDouble(3,lon);
+                preparedStatement.setDouble(4,lat);
+                preparedStatement.setString(5,transferId);
+                preparedStatement.setString(6,id);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
