@@ -2,8 +2,11 @@ package com.baling.util;
 
 import com.baling.payload.response.DataResponse;
 import com.baling.security.services.UserDetailsImpl;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,6 +110,22 @@ public class CommonMethod {
         }else {
             return prefix+ c;
         }
+    }
+
+    public static Map<String, Object> convertToMap(Object obj) {
+        try {
+            if (obj instanceof Map)return (Map)obj;
+            Map<String, Object> returnMap = PropertyUtils.describe(obj);
+            returnMap.remove("class");
+            return returnMap;
+        } catch (IllegalAccessException e1) {
+            e1.getMessage();
+        } catch (InvocationTargetException e2) {
+            e2.getMessage();
+        } catch (NoSuchMethodException e3) {
+            e3.getMessage();
+        }
+        return new HashMap();
     }
 
 }

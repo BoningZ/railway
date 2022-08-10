@@ -15,5 +15,15 @@
       <jdbc-url>jdbc:mysql://bj-cdb-koq9r5sw.sql.tencentcdb.com:60263/railway</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="user109db@120.46.182.143" uuid="80f4b88a-08e8-48ae-b2e1-841d0c2d399f">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://120.46.182.143:3306/user109db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <driver-properties>
+        <property name="allowPublicKeyRetrieval" value="TRUE" />
+      </driver-properties>
+    </data-source>
   </component>
 </project>

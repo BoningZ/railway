@@ -73,6 +73,18 @@ function getGPA(data){
 function submitScore(data){
     return generalRequest('api/score/submitScore',data);
 }
+function getCountries(data){
+    return generalRequest('api/info/country',data);
+}
+function getCompanies(data){
+    return generalRequest('api/info/company',data);
+}
+function getStations(data){
+    return generalRequest('/api/info/station',data);
+}
+function getStationsLike(data){
+    return generalRequest('/api/info/stationLike',data);
+}
 
 //  company
 
@@ -96,4 +108,8 @@ export {
     select,
     unselect,
     getWeeklyTable,
+    getCountries,
+    getCompanies,
+    getStations,
+    getStationsLike,
 }

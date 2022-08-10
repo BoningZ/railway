@@ -9,11 +9,7 @@
         <el-input style="width: 75%" clearable v-model="username"  name="username" placeholder="请输入用户名"></el-input>
       </div>
 
-      <div class="form-group">
-        <h2></h2>
-        <el-label for="username">姓名</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-input style="width: 75%" clearable v-model="name"  name="name" placeholder="请输入姓名"></el-input>
-      </div>
+
 
       <div class="form-group">
         <h2></h2>
@@ -26,25 +22,101 @@
         <el-input style="width: 75%"  clearable placeholder="请输入重复密码" v-model="password2" show-password></el-input>
       </div>
       <div style="margin-top: 20px" id="register">
-        <el-radio-group v-model="role" size="mini" >
-          <el-radio label="ROLE_USER" border>我是学生</el-radio>
-          <el-radio label="ROLE_ADMIN" border>我是教师</el-radio>
+        <el-radio-group v-model="type" size="mini" >
+          <el-radio label="0" border>我是乘客</el-radio>
+          <el-radio label="1" border>我是员工</el-radio>
         </el-radio-group>
       </div>
 
-      <div class="form-group"  v-show="(role==='ROLE_USER')">
-        <h2></h2>
-        <el-label for="username">学号</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <el-input style="width: 75%" clearable v-model="sid"  name="sid" placeholder="请输入学号"></el-input>
+      <div style="margin-top: 20px" v-show="(type==='1')">
+        <el-radio-group v-model="role" size="mini" >
+          <el-radio label="ROLE_DRIVER" >司机</el-radio>
+          <el-radio label="ROLE_ADMIN_COUNTRY" >国家管理</el-radio>
+          <el-radio label="ROLE_ADMIN_STATION" >车站管理</el-radio>
+          <el-radio label="ROLE_ADMIN_COMPANY" >运营局管理</el-radio>
+        </el-radio-group>
       </div>
 
-      <div class="form-group"  v-show="(role==='ROLE_ADMIN')">
+      <div class="form-group" v-show="(type==='0')">
+        <h2></h2>
+        <el-label for="username">身份证号</el-label>&nbsp;
+        <el-input style="width: 75%" clearable v-model="sid"  name="name" placeholder="请输入身份证号"></el-input>
+      </div>
+
+      <div class="form-group" v-show="(role==='ROLE_DRIVER'||type==='0')">
+        <h2></h2>
+        <el-label for="username">姓名</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-input style="width: 75%" clearable v-model="name"  name="name" placeholder="请输入姓名"></el-input>
+      </div>
+
+      <div class="form-group"  v-show="(type==='1')">
         <h2></h2>
         <el-label for="username">工号</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <el-input style="width: 75%" clearable v-model="tid"  name="tid" placeholder="请输入工号"></el-input>
       </div>
 
-      <div class="form-group"  v-show="(role==='ROLE_ADMIN')">
+      <div class="form-group"  v-show="(role==='ROLE_DRIVER'&&type==='1')">
+        <h2></h2>
+        <el-label for="username">电话</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-input style="width: 75%" clearable v-model="tel"  name="tel" placeholder="请输入电话"></el-input>
+      </div>
+
+      <div class="form-group" v-show="(role==='ROLE_ADMIN_COUNTRY'||type==='0')">
+        <h2></h2>
+        <el-label for="username">国家</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-select style="width: 75%" v-model="country" placeholder="Select">
+          <el-option
+              v-for="item in countries"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+          >
+            <span style="float: left">{{ item.name }}</span>
+            <span style="float: right;color: var(--el-text-color-secondary);font-size: 13px;">{{ item.id }}</span>
+          </el-option>
+        </el-select>
+      </div>
+
+      <div class="form-group" v-show="(role==='ROLE_ADMIN_COMPANY'&&type==='1')">
+        <h2></h2>
+        <el-label for="username">运营局</el-label>&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-select style="width: 75%" filterable v-model="company" placeholder="Select">
+          <el-option
+              v-for="item in companies"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+          >
+            <span style="float: left">{{ item.name }}</span>
+            <span style="float: right;color: var(--el-text-color-secondary);font-size: 13px;">{{ item.id }}</span>
+          </el-option>
+        </el-select>
+      </div>
+
+      <div class="form-group" v-show="(role==='ROLE_ADMIN_STATION'&&type==='1')">
+        <h2></h2>
+        <el-label for="username">车站</el-label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <el-select style="width: 75%" filterable v-model="station"
+                   remote
+                   reserve-keyword
+                   placeholder="请输入车站名"
+                   :remote-method="searchStations"
+                   :loading="loading">
+          <el-option
+              v-for="item in stations"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+          >
+            <span style="float: left">{{ item.name }}</span>
+            <span style="float: right;color: var(--el-text-color-secondary);font-size: 13px;">{{ item.id }}</span>
+          </el-option>
+        </el-select>
+      </div>
+
+
+
+      <div class="form-group"  v-show="(type==='1')">
         <h2></h2>
         <el-label for="username">校验密码</el-label>&nbsp;
         <el-input style="width: 75%" clearable v-model="check"  name="check" placeholder="请输入校验密码"></el-input>
@@ -61,23 +133,55 @@
 </template>
 
 <script>
-import {register} from '@/service/genServ.js'
+import {register,getCountries,getCompanies,getStationsLike} from '@/service/genServ.js'
+import {ref} from "vue";
 
 export default {
   name: "Register",
   data(){
     return{
+      sid:'',
       username:'',
       password:'',
       password2:'',
-      sid:'',
       name:'',
       tid:'',
-      role:'ROLE_USER',
+      tel:'',
+      type:'0',
+      role:'ROLE_DRIVER',
       check:'',
+      countries:[],
+      country:'CN',
+      companies:[],
+      company:'CN-370000',
+      stations:[],
+      station:null,
+      loading:ref(false),
     }
   },
+  created() {
+    this.getInit();
+  },
   methods: {
+    getInit(){
+      getCountries().then(res=>{
+        this.countries=res.data;
+      })
+      getCompanies().then(res=>{
+        this.companies=res.data;
+      })
+    },
+    searchStations(query){
+      if(query){
+        this.loading=ref(true)
+        setTimeout(() => {
+          this.loading=ref(false)
+          getStationsLike({'name':query}).then(res=>{
+            this.stations=res.data
+          })
+        }, 200)
+      }else this.stations=[];
+    },
     handleSubmit() {
       if(this.password!==this.password2){
         this.$message({

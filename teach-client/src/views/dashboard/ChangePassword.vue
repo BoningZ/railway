@@ -1,4 +1,4 @@
-<template xmlns="">
+<template>
   <Navi/>
 
   <div  class="form-div">
