@@ -182,21 +182,45 @@ export default {
         }, 200)
       }else this.stations=[];
     },
+    checkCompleteness(){
+      if(!this.username||!this.password)return false;
+      if(this.type==='0')
+        return !!(this.name && this.country && this.sid);
+      else{
+        if(this.role==='ROLE_DRIVER')
+          return !!(this.tid && this.tel && this.name);
+        else if(this.role==='ROLE_ADMIN_STATION')
+          return !!(this.tid&&this.station);
+        else if(this.role==='ROLE_ADMIN_COMPANY')
+          return !!(this.tid&&this.company);
+        else if(this.role==='ROLE_ADMIN_COUNTRY')
+          return !!(this.tid&&this.country);
+      }
+    },
     handleSubmit() {
       if(this.password!==this.password2){
         this.$message({
           message:  '口令不一致！',
           type: 'warning',
         })
-      }if((this.role==='ROLE_USER'&&(!this.name||!this.sid||!this.username||!this.password))||
-          (this.role==='ROLE_ADMIN'&&(!this.name||!this.tid||!this.username||!this.password||!this.check))){
+      }if(!this.checkCompleteness()){
         this.$message({
           message:  '所有项目均为必填项！',
           type: 'warning',
         })
       }
         else{
-        register({'username':this.username,'password':this.password,'role':this.role,'sid':this.sid,'tid':this.tid,'name':this.name,'check':this.check}).then(response=>{
+        register({'username':this.username,
+                        'password':this.password,
+                        'role':this.type==='0'?'ROLE_PASSENGER':this.role,
+                        'tel':this.tel,
+                        'country':this.country,
+                        'company':this.company,
+                        'station':this.station,
+                        'sid':this.sid,
+                        'tid':this.tid,
+                        'name':this.name,
+                        'check':this.check}).then(response=>{
           if (response.code === '0') {
             this.$message({
               message:  '成功，跳转到登录页面',
