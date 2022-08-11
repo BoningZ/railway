@@ -2,6 +2,7 @@ package com.baling.models.administration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -17,7 +18,7 @@ public class Country {
     private String name;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "currency_id")
     private Currency currency;
 

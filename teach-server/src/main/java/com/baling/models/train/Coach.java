@@ -2,6 +2,7 @@ package com.baling.models.train;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,7 +16,7 @@ public class Coach {
     @Size(max = 20)
     private String name;
 
-    @NotBlank
+    @NotNull
     private int maxFreeCount;
 
     private boolean isRefrigerated;

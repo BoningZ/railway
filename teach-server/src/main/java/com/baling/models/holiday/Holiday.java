@@ -2,6 +2,7 @@ package com.baling.models.holiday;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 
@@ -16,10 +17,10 @@ public class Holiday {
     @Size(max = 20)
     private String name;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date start;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date end;
 
     public String getId() {

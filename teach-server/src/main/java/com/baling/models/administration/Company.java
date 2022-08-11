@@ -2,6 +2,7 @@ package com.baling.models.administration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -16,14 +17,14 @@ public class Company {
     private String name;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "country_id")
     private Country country;
 
     @Size(max = 60)
     private String website;
 
-    @NotBlank
+    @NotNull
     private int maxAlter;
 
     public String getId() {

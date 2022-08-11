@@ -2,6 +2,7 @@ package com.baling.models.line;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 
@@ -12,15 +13,15 @@ public class RunDate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date start;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date end;
 
     public int getId() {

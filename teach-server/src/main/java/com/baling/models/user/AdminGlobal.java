@@ -2,6 +2,7 @@ package com.baling.models.user;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -14,7 +15,7 @@ public class AdminGlobal {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    @NotBlank
+    @NotNull
     private User user;
 
     public String getId() {

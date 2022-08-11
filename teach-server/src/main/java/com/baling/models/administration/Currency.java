@@ -4,6 +4,7 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -21,7 +22,7 @@ public class Currency {
     private String name;
 
     @JoinColumn(name = "to_rmb")
-    @NotBlank
+    @NotNull
     private double toRmb;
 
     public String getId() {

@@ -4,6 +4,7 @@ import com.baling.models.user.Passenger;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 
@@ -14,17 +15,17 @@ public class PassengerDiscount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "passenger_id")
     private Passenger passenger;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "discount_id")
     private Discount discount;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date start;
 
     private java.sql.Date expire;

@@ -4,6 +4,7 @@ import com.baling.models.administration.Country;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -13,12 +14,12 @@ public class CountryDiscount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "discount_id")
     private Discount discount;

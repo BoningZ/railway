@@ -2,6 +2,7 @@ package com.baling.models.discount;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,15 +16,15 @@ public class Discount {
     @Size(max = 20)
     private String name;
 
-    @NotBlank
+    @NotNull
     private double power;
 
     private int limitInYear;
 
-    @NotBlank
+    @NotNull
     private boolean isRegional;
 
-    @NotBlank
+    @NotNull
     private boolean isOpen;
 
     public String getId() {

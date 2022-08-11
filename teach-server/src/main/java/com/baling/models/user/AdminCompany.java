@@ -4,6 +4,7 @@ import com.baling.models.administration.Company;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,12 +16,12 @@ public class AdminCompany {
 
     @OneToOne
     @JoinColumn(name="user_id")
-    @NotBlank
+    @NotNull
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @NotBlank
+    @NotNull
     private Company company;
 
     public String getId() {

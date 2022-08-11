@@ -4,6 +4,7 @@ import com.baling.models.user.UserType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -14,12 +15,12 @@ public class TypeMenu {
     private int id;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "user_type_id")
     private UserType userType;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "sys_menu_id")
     private SysMenu sysMenu;
 

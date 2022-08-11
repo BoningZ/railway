@@ -4,6 +4,7 @@ import com.baling.models.administration.Station;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,12 +16,12 @@ public class AdminStation {
 
     @OneToOne
     @JoinColumn(name = "user_id")
-    @NotBlank
+    @NotNull
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "station_id")
-    @NotBlank
+    @NotNull
     private Station station;
 
     public String getId() {

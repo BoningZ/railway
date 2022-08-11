@@ -2,6 +2,7 @@ package com.baling.models.train;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,10 +16,10 @@ public class Seat {
     @Size(max = 20)
     private String name;
 
-    @NotBlank
+    @NotNull
     private double power;
 
-    @NotBlank
+    @NotNull
     private double constant;
 
     public String getId() {

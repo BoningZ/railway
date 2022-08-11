@@ -2,6 +2,7 @@ package com.baling.models.administration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -15,17 +16,17 @@ public class Station {
     @Size(max = 20)
     private String name;
 
-    @NotBlank
+    @NotNull
     private double lon;
 
-    @NotBlank
+    @NotNull
     private double lat;
 
-    @NotBlank
+    @NotNull
     private double timeZone;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name="city_id")
     private City city;
 

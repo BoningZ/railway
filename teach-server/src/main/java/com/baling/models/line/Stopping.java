@@ -4,6 +4,7 @@ import com.baling.models.administration.Station;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Time;
 
@@ -15,25 +16,25 @@ public class Stopping {
     private int id;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "line_id")
     private Line line;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "station_id")
     private Station station;
 
-    @NotBlank
+    @NotNull
     private int orderInLine;
 
-    @NotBlank
+    @NotNull
     private int arrival;
 
-    @NotBlank
+    @NotNull
     private int stay;
 
-    @NotBlank
+    @NotNull
     private double constant;
 
     public int getId() {

@@ -4,6 +4,7 @@ import com.baling.models.administration.Station;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -13,12 +14,12 @@ public class StationFault {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "station_id")
     private Station station;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "fault_id")
     private Fault fault;

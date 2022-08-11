@@ -2,6 +2,7 @@ package com.baling.models.sys_menu;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -11,7 +12,7 @@ public class SysMenu {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private SysMenu sysMenu;
@@ -24,7 +25,7 @@ public class SysMenu {
     @Size(max = 60)
     private String url;
 
-    @NotBlank
+    @NotNull
     private int depth;
 
     @Size(max = 60)

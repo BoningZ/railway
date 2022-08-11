@@ -4,6 +4,7 @@ import org.springframework.data.repository.cdi.Eager;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -21,7 +22,7 @@ public class Train {
 
     @ManyToOne
     @JoinColumn(name = "train_type_id")
-    @NotBlank
+    @NotNull
     private TrainType trainType;
 
     public String getId() {

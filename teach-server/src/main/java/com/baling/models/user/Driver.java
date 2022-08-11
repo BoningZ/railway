@@ -2,6 +2,7 @@ package com.baling.models.user;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -21,7 +22,7 @@ public class Driver {
     private String name;
 
     @OneToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "user_id")
     private User user;
 

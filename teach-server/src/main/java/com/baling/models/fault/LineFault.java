@@ -4,6 +4,7 @@ import com.baling.models.line.Line;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -13,12 +14,12 @@ public class LineFault {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "fault_id")
     private Fault fault;

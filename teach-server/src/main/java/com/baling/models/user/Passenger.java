@@ -4,6 +4,7 @@ import com.baling.models.administration.Country;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 
@@ -25,12 +26,12 @@ public class Passenger {
     private java.sql.Date birthday;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name="country_id")
     private Country country;
 
     @OneToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "user_id")
     private User user;
 

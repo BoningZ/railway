@@ -4,6 +4,7 @@ import com.baling.models.user.Driver;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Time;
 
@@ -15,17 +16,17 @@ public class Departure {
     private String id;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "line_id")
     private Line line;
 
-    @NotBlank
+    @NotNull
     private int start;
 
-    @NotBlank
+    @NotNull
     private int schedule;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "driver_id")
     private Driver driver;

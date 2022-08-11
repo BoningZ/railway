@@ -2,6 +2,7 @@ package com.baling.models.administration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -16,7 +17,7 @@ public class District {
     private String name;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "city_id")
     private City city;
 

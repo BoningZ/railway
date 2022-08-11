@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 
@@ -16,39 +17,39 @@ public class Ticket {
     @Size(max = 20)
     private String id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "travel_id")
     private Travel travel;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "seat_id")
     private Seat seat;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "ticket_status_id")
     private TicketStatus ticketStatus;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date startDate;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "departure_id")
     private Departure departure;
 
-    @NotBlank
+    @NotNull
     private int start;
 
-    @NotBlank
+    @NotNull
     private int end;
 
-    @NotBlank
+    @NotNull
     private double price;
 
-    @NotBlank
+    @NotNull
     private int coachNum;
 
     private int rowPosition;
@@ -56,10 +57,10 @@ public class Ticket {
     @Size(max = 10)
     private String col;
 
-    @NotBlank
+    @NotNull
     private int altered;
 
-    @NotBlank
+    @NotNull
     private int orderInTravel;
 
     public String getId() {

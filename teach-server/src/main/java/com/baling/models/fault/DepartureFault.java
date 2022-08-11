@@ -4,6 +4,7 @@ import com.baling.models.line.Departure;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.sql.Time;
@@ -15,15 +16,15 @@ public class DepartureFault {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "departure_id")
     private Departure departure;
 
-    @NotBlank
+    @NotNull
     private java.sql.Date startDate;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "fault_id")
     private Fault fault;

@@ -2,6 +2,7 @@ package com.baling.models.administration;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -12,14 +13,14 @@ public class CompanyRefund {
     private String id;
 
     @ManyToOne
-    @NotBlank
+    @NotNull
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @NotBlank
+    @NotNull
     private double leftHour;
 
-    @NotBlank
+    @NotNull
     private double ratio;
 
     public String getId() {

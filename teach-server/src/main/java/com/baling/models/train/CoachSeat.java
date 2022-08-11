@@ -2,6 +2,7 @@ package com.baling.models.train;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -11,13 +12,13 @@ public class CoachSeat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "coach_id")
     @Size(max = 20)
     private Coach coach;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "seat_id")
     @Size(max = 20)

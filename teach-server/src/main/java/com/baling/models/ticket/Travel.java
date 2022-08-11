@@ -4,6 +4,7 @@ import com.baling.models.user.Passenger;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -14,10 +15,10 @@ public class Travel {
     @Size(max = 20)
     private String id;
 
-    @NotBlank
+    @NotNull
     private java.util.Date buyTime;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "passenger_id")
     private Passenger passenger;

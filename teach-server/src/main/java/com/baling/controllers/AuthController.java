@@ -9,9 +9,10 @@ import javax.validation.Valid;
 import com.baling.models.user.*;
 import com.baling.payload.request.DataRequest;
 import com.baling.payload.response.DataResponse;
-import com.baling.repository.user.DriverRepository;
-import com.baling.repository.user.PassengerRepository;
-import com.baling.repository.user.UserTypeRepository;
+import com.baling.repository.administration.CompanyRepository;
+import com.baling.repository.administration.CountryRepository;
+import com.baling.repository.administration.StationRepository;
+import com.baling.repository.user.*;
 import com.baling.util.CommonMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baling.payload.request.LoginRequest;
 import com.baling.payload.response.JwtResponse;
-import com.baling.repository.user.UserRepository;
 import com.baling.security.jwt.JwtUtils;
 import com.baling.security.services.UserDetailsImpl;
 
@@ -42,15 +42,24 @@ public class AuthController {
 
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     PassengerRepository passengerRepository;
-
     @Autowired
     DriverRepository driverRepository;
-
     @Autowired
     UserTypeRepository userTypeRepository;
+    @Autowired
+    CountryRepository countryRepository;
+    @Autowired
+    StationRepository stationRepository;
+    @Autowired
+    CompanyRepository companyRepository;
+    @Autowired
+    AdminCompanyRepository adminCompanyRepository;
+    @Autowired
+    AdminCountryRepository adminCountryRepository;
+    @Autowired
+    AdminStationRepository adminStationRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -105,30 +114,71 @@ public class AuthController {
             UserType userRole = userTypeRepository.findByName(EUserType.valueOf(strRoles));
             user.setUserType(userRole);
         }
+
         switch (user.getUserType().getName()){
             case ROLE_PASSENGER:
-                if(passengerRepository.existsById(signUpRequest.getString("id")))return CommonMethod.getReturnMessageError("该身份证号已被注册！");
+                if(passengerRepository.existsById(signUpRequest.getString("sid")))return CommonMethod.getReturnMessageError("该身份证号已被注册！");
                 Passenger passenger=new Passenger();
                 passenger.setName(signUpRequest.getString("name"));
-                passenger.setId(signUpRequest.getString("Id"));
+                passenger.setId(signUpRequest.getString("sid"));
+                passenger.setCountry(countryRepository.getById(signUpRequest.getString("country")));
+                userRepository.save(user);
                 passenger.setUser(user);
                 passengerRepository.save(passenger);
                 break;
             case ROLE_DRIVER:
-                if(driverRepository.existsById(signUpRequest.getString("Id")))return CommonMethod.getReturnMessageError("该工号已被注册！");
-                if(!signUpRequest.getString("check").equals("202022300310"))return CommonMethod.getReturnMessageError("校验密码错误！");
+                if(driverRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
+                if(!checker(signUpRequest.getString("check"),"drive"))return CommonMethod.getReturnMessageError("校验密码错误！");
                 Driver driver=new Driver();
                 driver.setName(signUpRequest.getString("name"));
-                driver.setId(signUpRequest.getString("id"));
+                driver.setId(signUpRequest.getString("tid"));
+                driver.setTel(signUpRequest.getString("tel"));
+                userRepository.save(user);
                 driver.setUser(user);
                 driverRepository.save(driver);
                 break;
+            case ROLE_ADMIN_COUNTRY:
+                if(adminCountryRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
+                String countryId=signUpRequest.getString("country");
+                if(!checker(signUpRequest.getString("check"),countryId))return CommonMethod.getReturnMessageError("校验密码错误！");
+                AdminCountry adminCountry=new AdminCountry();
+                adminCountry.setId(signUpRequest.getString("tid"));
+                adminCountry.setCountry(countryRepository.getById(countryId));
+                userRepository.save(user);
+                adminCountry.setUser(user);
+                adminCountryRepository.save(adminCountry);
+            case ROLE_ADMIN_COMPANY:
+                if(adminCompanyRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
+                String companyId=signUpRequest.getString("company");
+                if(!checker(signUpRequest.getString("check"),companyId))return CommonMethod.getReturnMessageError("校验密码错误！");
+                AdminCompany adminCompany=new AdminCompany();
+                adminCompany.setId(signUpRequest.getString("tid"));
+                adminCompany.setCompany(companyRepository.getById(companyId));
+                userRepository.save(user);
+                adminCompany.setUser(user);
+                adminCompanyRepository.save(adminCompany);
+            case ROLE_ADMIN_STATION:
+                if(adminStationRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
+                String stationId=signUpRequest.getString("station");
+                if(!checker(signUpRequest.getString("check"),stationId))return CommonMethod.getReturnMessageError("校验密码错误！");
+                AdminStation adminStation=new AdminStation();
+                adminStation.setId(signUpRequest.getString("tid"));
+                adminStation.setStation(stationRepository.getById(stationId));
+                userRepository.save(user);
+                adminStation.setUser(user);
+                adminStationRepository.save(adminStation);
         }
-
-
-        userRepository.save(user);
-
         return CommonMethod.getReturnMessageOK();
+    }
+
+    private boolean checker(String st1,String st2){
+        if(st1.length()!=st2.length())return false;
+        for(int i=0;i<st1.length();i++){
+            char c1=st1.charAt(i),c2=st2.charAt(i);
+            if(c1==c2)return false;
+            if(c1%233!=c2%233)return false;
+        }
+        return true;
     }
 
 

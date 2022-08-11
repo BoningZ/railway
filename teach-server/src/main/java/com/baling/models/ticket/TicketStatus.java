@@ -2,6 +2,7 @@ package com.baling.models.ticket;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -14,7 +15,7 @@ public class TicketStatus {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    @NotBlank
+    @NotNull
     private ETicketStatus name;
 
     public int getId() {
