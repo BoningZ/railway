@@ -1,5 +1,7 @@
 package com.baling.models.train;
 
+import com.baling.util.CommonMethod;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -30,6 +32,12 @@ public class CoachSeat {
 
     @Size(max = 20)
     private String cols;
+
+    public int numOfSeats(){
+        if(cols.equals("顺序编号"))return rowsPosition;
+        if(rowsPosition==-1)return -1;
+        return CommonMethod.numOfOnes(rowsPosition)* cols.split(",|/").length;
+    }
 
     public int getId() {
         return id;

@@ -1,9 +1,11 @@
 package com.baling.controllers;
 
+import com.baling.models.sys_menu.TypeMenu;
 import com.baling.models.user.EUserType;
 import com.baling.models.user.User;
 import com.baling.payload.request.DataRequest;
 import com.baling.payload.response.DataResponse;
+import com.baling.repository.sys_menu.TypeMenuRepository;
 import com.baling.repository.user.UserRepository;
 import com.baling.util.CommonMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class TestController {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    TypeMenuRepository typeMenuRepository;
 
     @GetMapping("/all")
     public String allAccess() {
@@ -61,29 +65,19 @@ public class TestController {
         ));
     }
     @PostMapping("/getMenuList")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('PASSENGER') or hasRole('ADMIN')")
     public DataResponse getMenuList(@Valid @RequestBody DataRequest dataRequest) {
         Integer userId= CommonMethod.getUserId();
         User user;
         Optional<User> tmp = userRepository.findByUserId(userId);
         user = tmp.get();
         List mList = new ArrayList();
-        Map m = new HashMap();
-        m.put("name","ChangePassword");
-        m.put("title","修改密码");
-        mList.add(m);
-
-
-        if(user.getUserType().getName()== EUserType.ROLE_DRIVER) {
-
-            m = new HashMap();
-            m.put("name", "TeacherProfile");
-            m.put("title", "个人资料");
-            mList.add(m);
-        }else{
+        Map m;
+        List<TypeMenu> menus=typeMenuRepository.getTypeMenusByUserType(user.getUserType());
+        for(TypeMenu tm:menus){
             m=new HashMap();
-            m.put("name","StudentProfile");
-            m.put("title","个人资料");
+            m.put("name",tm.getSysMenu().getUrl());
+            m.put("title",tm.getSysMenu().getName());
             mList.add(m);
         }
         return CommonMethod.getReturnData(mList);

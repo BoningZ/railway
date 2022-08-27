@@ -45,13 +45,16 @@ public class ProfileController {
         }else{
             Passenger passenger=passengerRepository.findByUser(user);
             m.put("id",passenger.getId());
+            m.put("tel",passenger.getTel());
+            m.put("birthday",passenger.getBirthday());
+            m.put("country",passenger.getCountry().getName());
             m.put("name",passenger.getName());
         }
         return CommonMethod.getReturnData(m);
     }
 
     @PostMapping("/submitProfile")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('PASSENGER') or hasRole('ADMIN')")
     public DataResponse submitProfile(@Valid @RequestBody DataRequest dataRequest){
         Integer userId= CommonMethod.getUserId();
         User user;
@@ -64,17 +67,9 @@ public class ProfileController {
             driverRepository.save(driver);
         }else{
             Passenger passenger=passengerRepository.findByUser(user);
-            passenger.setId(dataRequest.getString("id"));
             passenger.setName(dataRequest.getString("name"));
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date birth=null;
-            Calendar cal=Calendar.getInstance();
-            try {
-                birth=format.parse(dataRequest.getString("birthday"));
-                cal.setTime(birth);
-                cal.add(Calendar.DATE,1);
-                birth=cal.getTime();
-            } catch (ParseException e) {e.printStackTrace();}
+            passenger.setTel(dataRequest.getString("tel"));
+            passenger.setBirthday(dataRequest.getDate("birthday"));
             passengerRepository.save(passenger);
         }
         return CommonMethod.getReturnMessageOK();

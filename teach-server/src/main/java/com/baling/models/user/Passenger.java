@@ -10,11 +10,17 @@ import java.sql.Date;
 
 @Entity
 @Table(name="passenger",
-uniqueConstraints = @UniqueConstraint(columnNames = "user_id"))
+uniqueConstraints = {@UniqueConstraint(columnNames = "user_id"),
+    @UniqueConstraint(columnNames = {"licence","country_id"})}
+)
 public class Passenger {
     @Id
     @Size(max = 20)
     private String id;
+
+    @Size(max=40)
+    @NotBlank
+    private String licence;
 
     @Size(max = 20)
     private String tel;
@@ -81,5 +87,13 @@ public class Passenger {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getLicence() {
+        return licence;
+    }
+
+    public void setLicence(String licence) {
+        this.licence = licence;
     }
 }

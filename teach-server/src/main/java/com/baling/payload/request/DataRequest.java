@@ -1,6 +1,9 @@
 package com.baling.payload.request;
 
 import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DataRequest {
@@ -103,8 +106,15 @@ public class DataRequest {
             return null;
         }
     }
-    public Date getDate(String key) {
-        return null;
+    public java.sql.Date getDate(String key)  {
+        try {
+            Object obj = data.get(key);
+            System.out.println(obj);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date date = format.parse((String) obj);
+            return new java.sql.Date(date.getTime());
+        }catch (Exception e){return null;}
     }
     public Time getTime(String key) {
         return null;

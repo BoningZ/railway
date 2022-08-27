@@ -117,11 +117,14 @@ public class AuthController {
 
         switch (user.getUserType().getName()){
             case ROLE_PASSENGER:
-                if(passengerRepository.existsById(signUpRequest.getString("sid")))return CommonMethod.getReturnMessageError("该身份证号已被注册！");
+                String country=signUpRequest.getString("country");
+                String id=signUpRequest.getString("sid");
+                if(passengerRepository.existsById(country+id))return CommonMethod.getReturnMessageError("你所在的国家该身份证号已被注册！");
                 Passenger passenger=new Passenger();
                 passenger.setName(signUpRequest.getString("name"));
-                passenger.setId(signUpRequest.getString("sid"));
-                passenger.setCountry(countryRepository.getById(signUpRequest.getString("country")));
+                passenger.setId(country+id);
+                passenger.setCountry(countryRepository.getById(country));
+                passenger.setLicence(id);
                 userRepository.save(user);
                 passenger.setUser(user);
                 passengerRepository.save(passenger);

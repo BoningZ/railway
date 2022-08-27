@@ -7,6 +7,8 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,5 +129,24 @@ public class CommonMethod {
         }
         return new HashMap();
     }
+
+    public static java.sql.Date addByDay(java.sql.Date origin,int delta){
+        Calendar c= Calendar.getInstance();
+        c.setTime(origin);
+        c.add(Calendar.DATE,delta);
+        return (Date) c.getTime();
+    }
+
+    public static String minToHourString(int min){
+        return String.format("%02d:%02d",min/60,min%60);
+    }
+
+    public static int numOfOnes(int status){
+        int res=0;
+        while(status>0){res+=status%2;status/=2;}
+        return res;
+    }
+
+
 
 }

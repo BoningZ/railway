@@ -47,6 +47,11 @@ const routes = [
     path: '/PassengerProfile',
     name:'PassengerProfile',
     component:()=>import('@/views/dashboard/PassengerProfile')
+  },
+  {
+    path: '/Booking',
+    name:'Booking',
+    component:()=>import('@/views/passenger/Booking')
   }
 ]
 

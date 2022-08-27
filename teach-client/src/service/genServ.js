@@ -85,6 +85,12 @@ function getStations(data){
 function getStationsLike(data){
     return generalRequest('/api/info/stationLike',data);
 }
+function getCityWithPos(data){
+    return generalRequest('/api/info/cityWithPos',data);
+}
+function getStationWithPos(data){
+    return generalRequest('/api/info/stationWithPos',data);
+}
 
 //  company
 
@@ -112,4 +118,6 @@ export {
     getCompanies,
     getStations,
     getStationsLike,
+    getStationWithPos,
+    getCityWithPos,
 }

@@ -18,4 +18,5 @@ public class DataProcessor {
         }
         return good;
     }
+
 }
