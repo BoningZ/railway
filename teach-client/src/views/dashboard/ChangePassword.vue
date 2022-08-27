@@ -10,7 +10,7 @@
           </el-col>
           <el-col :span="10">
             <el-form-item label="旧密码" prop="oldPas">
-              <el-input v-model="oldPassword" :type="passw" style="width: 200px;background-color: #f4f4f5"/>
+              <el-input v-model="oldPassword" :type="passw" style="width: 500px;background-color: #f4f4f5"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -20,7 +20,7 @@
           </el-col>
           <el-col :span="10">
             <el-form-item label="新密码" prop="oldPas">
-              <el-input v-model="newPassword" :type="passw"  style="width: 200px;background-color: #f4f4f5"/>
+              <el-input v-model="newPassword" :type="passw"  style="width: 500px;background-color: #f4f4f5"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -30,7 +30,7 @@
           </el-col>
           <el-col :span="10">
             <el-form-item label="确认密码" prop="oldPas">
-              <el-input v-model="newPassword1" :type="passw"  style="width: 200px;background-color: #f4f4f5"/>
+              <el-input v-model="newPassword1" :type="passw"  style="width: 500px;background-color: #f4f4f5"/>
             </el-form-item>
           </el-col>
         </el-row>
