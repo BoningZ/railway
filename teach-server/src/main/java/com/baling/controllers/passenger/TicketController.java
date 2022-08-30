@@ -60,26 +60,41 @@ public class TicketController {
 
     @PostMapping("/getTransferInfo")
     @PreAuthorize("hasRole('PASSENGER')")
-    public DataResponse getProfile(@Valid @RequestBody DataRequest dataRequest){
+    public DataResponse getTransferInfo(@Valid @RequestBody DataRequest dataRequest){
+        maxTrans=dataRequest.getInteger("maxTransfer");
+        allowedInCity=dataRequest.getBoolean("transferInCity");
+        priMoney=dataRequest.getString("priority").equals("money");
         String fromRange=dataRequest.getString("fromRange"),toRange=dataRequest.getString("toRange");
+        fromId=dataRequest.getString("fromId"); toId=dataRequest.getString("toId");
         switch (fromRange){
-            case "city":from=stationRepository.findByCity(cityRepository.getById(dataRequest.getString("fromCityId")));break;
-            case "station":from= Collections.singletonList(stationRepository.getById(dataRequest.getString("fromStationId")));break;
+            case "city":from=stationRepository.findByCity(cityRepository.getById(fromId));fromCity=true;break;
+            case "station":from= Collections.singletonList(stationRepository.getById(fromId));fromCity=false;break;
         }
         switch (toRange){
-            case "city":to=stationRepository.findByCity(cityRepository.getById(dataRequest.getString("toCityId")));break;
-            case "station":to= Collections.singletonList(stationRepository.getById(dataRequest.getString("toStationId")));break;
+            case "city":to=stationRepository.findByCity(cityRepository.getById(toId));toCity=true;break;
+            case "station":to= Collections.singletonList(stationRepository.getById(toId));toCity=false;break;
         }
         startDate=dataRequest.getDate("startDate");
         List<Route> routes=getRoutes();
         if(routes.size()==0)return CommonMethod.getReturnMessageError("无法找到路径");
 
         List dataList=new ArrayList();
+        List<String> typeList=new ArrayList();
+        List typeFliter=new ArrayList();
         for(Route r:routes){
             Map mRoute=new HashMap();
-            mRoute.put("start",CommonMethod.minToHourString(r.startList.get(0).getArrival()+r.departureList.get(0).getStart()));
-            mRoute.put("duration",CommonMethod.minToHourString(r.minSpent+r.daySpent*24*60-(r.startList.get(0).getArrival()+r.departureList.get(0).getStart())));
+            int startTime=(r.startList.get(0).getArrival()+r.departureList.get(0).getStart())%(24*60);
+            mRoute.put("start",CommonMethod.minToHourString(startTime));
+            mRoute.put("duration",CommonMethod.minToHourString(r.minSpent+r.daySpent*24*60-startTime));
             mRoute.put("end",(r.daySpent>0?("+"+r.daySpent+"天  "):"")+CommonMethod.minToHourString(r.minSpent));
+            String type=r.getType();
+            mRoute.put("type",type);
+            if(!typeList.contains(type)){
+                typeList.add(type);
+                Map mmm=new HashMap();
+                mmm.put("text",type); mmm.put("value",type);
+                typeFliter.add(mmm);
+            }
             List inRoute=new ArrayList();
             for(int i=0;i<r.departureList.size();i++){
                 Map lineInfo=new HashMap();
@@ -97,7 +112,6 @@ public class TicketController {
                 lineInfo.put("startDate",CommonMethod.addByDay(startDate,datePassed));
                 lineInfo.put("startTime",CommonMethod.minToHourString((departure.getStart()+start.getArrival())%(24*60)));
                 lineInfo.put("startStation",start.getStation().getName());
-                lineInfo.put("startStationTransfer",start.getStation().getTransferId());
                 lineInfo.put("startId",start.getStation().getId());
 
                 lineInfo.put("duration",CommonMethod.minToHourString(end.getArrival()-start.getArrival()));
@@ -105,7 +119,6 @@ public class TicketController {
                 int lastAllMin=departure.getStart()+end.getArrival();
                 lineInfo.put("endTime",(lastAllMin>24*60?("+"+lastAllMin/(24*60)+"天 "):"")+CommonMethod.minToHourString(lastAllMin%(24*60)));
                 lineInfo.put("endStation",end.getStation().getName());
-                lineInfo.put("endStationTransfer",end.getStation().getTransferId());
                 lineInfo.put("endId",end.getStation().getId());
 
                 List seats=new ArrayList();
@@ -136,7 +149,9 @@ public class TicketController {
             mRoute.put("lines",inRoute);
             dataList.add(mRoute);
         }
-        return CommonMethod.getReturnData(dataList);
+        Map finalRes=new HashMap();
+        finalRes.put("table",dataList); finalRes.put("type",typeFliter);
+        return CommonMethod.getReturnData(finalRes);
     }
 
 
@@ -145,11 +160,19 @@ public class TicketController {
 
 
     //transfer algorithm
-    private final static int MAX_TRANSFER=7,MAX_ROUTES=100,MAX_TRANS_TIME=240,MIN_IN_CITY=60;
+    private final Comparator<DepartureNStopping> moneyPri=new Comparator<DepartureNStopping>() {public int compare(DepartureNStopping o1, DepartureNStopping o2){return (int) (o1.moneySpent()-o2.moneySpent());}},
+                                                 timePri=new Comparator<DepartureNStopping>() {public int compare(DepartureNStopping o1, DepartureNStopping o2){return (int) (o1.timeSpent()-o2.timeSpent());}};
+    private final static int MAX_TRANSFER=3,MAX_ROUTES=30,MAX_TRANS_TIME=240,MIN_IN_CITY=60;
+    private List<Line> lineVisited=new ArrayList<>();
     private Map<Station,Integer> toDest=new HashMap<>();//distance to destination
+    private Map<Station,List<Station>> mapDest=new HashMap<>();
     private List<Station> from,to;
     private java.sql.Date startDate;
     private int routeFound;
+    private boolean fromCity=false,toCity=false;
+    private String fromId,toId;
+    private Boolean priMoney=false,allowedInCity=false;
+    private Integer maxTrans=1;
     private static class Route{
         private List<Departure> departureList=new ArrayList<>();
         private List<Date> departureDateList=new ArrayList<>();
@@ -157,6 +180,15 @@ public class TicketController {
         private List<Stopping> endList=new ArrayList<>();
         private List<Integer> dateList=new ArrayList<>();
         private int daySpent=0,minSpent=0;
+        String getType(){
+            List<TrainType> good=new ArrayList<>();
+            for(Departure d:departureList){
+                TrainType cur=d.getLine().getTrain().getTrainType();
+                if(!good.contains(cur))good.add(cur);
+                if(good.size()>1)return "混合";
+            }
+            return good.get(0).getName();
+        }
         Route(Departure departure,Date date,Stopping stop){
             this.departureList.add(departure);
             this.departureDateList.add(date);
@@ -170,6 +202,7 @@ public class TicketController {
             startList=new ArrayList<>(another.startList);
             endList=new ArrayList<>(another.endList);
             dateList=new ArrayList<>(another.dateList);
+            daySpent=another.daySpent; minSpent=another.minSpent;
         }
         void append(Departure departure,Date date,Stopping stop){
             departureList.add(departure);
@@ -177,6 +210,7 @@ public class TicketController {
             startList.add(stop);
             int todayMin=(departure.getStart()+stop.getArrival())%(24*60);
             if(todayMin<minSpent)daySpent++;
+            minSpent=todayMin;
             dateList.add(daySpent);
         }
         void pushEnd(Stopping stop){
@@ -192,116 +226,171 @@ public class TicketController {
     }
     private List<Route> getRoutes(){
         routeFound=0;
-        List<Route> res=new ArrayList<>(),ready=new ArrayList<>();
-        expand(to);expand(from);
-        initToDest();
-        for(Station s:from) {//init today's departure
-            List<Stopping> stoppings = stoppingRepository.findByStation(s);
-            for(Stopping stop:stoppings){
-                Line line=stop.getLine();
-                List<Departure> departures=departureRepository.findByLine(line);
-                for(Departure d:departures)
-                    if(isValid(d,stop,startDate))ready.add(new Route(d,CommonMethod.addByDay(startDate,-(stop.getArrival()+d.getStart())/(24*60)),stop));
+        List<Route> res=new ArrayList<>();
+
+        List<Line> trySingle;
+        if(fromCity&&toCity)trySingle=lineRepository.findFromCityToCity(fromId,toId);
+        else if(fromCity)trySingle=lineRepository.findFromCityToStation(fromId,toId);
+        else if(toCity)trySingle=lineRepository.findFromStationToCity(fromId,toId);
+        else trySingle=lineRepository.findFromStationToStation(fromId,toId);
+        if(trySingle!=null){
+            double remain=1; Random random=new Random();
+            if(trySingle.size()>1.2*MAX_ROUTES)remain=(double)MAX_ROUTES*1.2/trySingle.size();
+            List<DepartureNStopping> ready=new ArrayList<>();
+            for(Line l:trySingle){
+                if(random.nextDouble()>remain)continue;
+                List<Departure> curDept=departureRepository.findByLine(l);
+                Stopping start=fromCity?stoppingRepository.findFirstByLineAndCity(l.getId(),fromId):stoppingRepository.findFirstByLineAndStation(l.getId(),fromId),
+                        end=toCity?stoppingRepository.findLastByLineAndCity(l.getId(),toId):stoppingRepository.findLastByLineAndStation(l.getId(),toId);
+                for(Departure d:curDept) {
+                    if (!isValid(d, start, startDate)) continue;
+                    ready.add(new DepartureNStopping(d,CommonMethod.addByDay(startDate,-(d.getStart()+start.getArrival())/(24*60)),end,start));
+                }
+            }
+            if(ready.size()>0){
+                ready.sort(priMoney?moneyPri:timePri);
+                for(DepartureNStopping ds:ready){
+                    Route tmp=new Route(ds.departure,ds.date,ds.start); tmp.pushEnd(ds.stopping);
+                    res.add(tmp);
+                    if(++routeFound>MAX_ROUTES)return res;
+                }
+                return res;
             }
         }
-        for(Route rr:ready)
-            res.addAll(dfs(rr,1));
+        if(maxTrans==0)return res;
+
+
+        lineVisited.clear();
+        Station okOne=initToDest();
+        if(okOne==null)return res;
+        List<DepartureNStopping> nxt;
+        nxt=fromCity?getValidDepartureInCity(okOne,startDate,0,24*60):getValidDeparture(from.get(0),startDate,0,24*60);
+        nxt.sort(priMoney?timePri:moneyPri);
+        for(DepartureNStopping ds:nxt){
+            if(routeFound>MAX_ROUTES)break;
+            Stopping start=ds.start,end=ds.stopping; Departure dep=ds.departure;
+            Route tmp=new Route(dep,ds.date,start); tmp.pushEnd(end);
+            if(toDest.get(end.getStation())==1){res.add(tmp);routeFound++;continue;}
+            res.addAll(dfs2(tmp,1));
+        }
         return res;
     }
-    private List<Route> dfs(Route route,int depth){
+    private List<Route> dfs2(Route route,int depth){
         if(depth>MAX_TRANSFER||routeFound>=MAX_ROUTES)return new ArrayList<>();
         List<Route> res=new ArrayList<>();
-        Stopping last=route.getLastStart();
-        List<Stopping> stoppings=stoppingRepository.findByLineOrderByOrderInLine(last.getLine());
-        for(Stopping stp:stoppings){
-            if(stp.getOrderInLine()<=last.getOrderInLine())continue;//previous stopping
-            Integer curDis=toDest.get(stp);
-            if(curDis!=null&&curDis<toDest.get(last)){//make advance to destination
-                route.pushEnd(stp);
-                if(curDis==1){res.add(route); return res;}//this branch ended by arriving
-                else {//more needed
-                    List<DepartureNStopping> nxt=getValidDepartureInCity(stp.getStation(),CommonMethod.addByDay(startDate,route.daySpent),route.minSpent,route.minSpent+MAX_TRANS_TIME);
-                    for(DepartureNStopping ds:nxt){
-                        Route tmp=new Route(route); tmp.append(ds.departure,ds.date,ds.stopping);
-                        res.addAll(dfs(tmp,depth+1));
-                    }
-                }
-                break;
+        Stopping last=route.getLastEnd();
+        List<DepartureNStopping> nxt=allowedInCity?getValidDepartureInCity(last.getStation(),CommonMethod.addByDay(startDate,route.daySpent),route.minSpent,route.minSpent+MAX_TRANS_TIME):
+                getValidDeparture(last.getStation(),CommonMethod.addByDay(startDate,route.daySpent),route.minSpent,route.minSpent+MAX_TRANS_TIME);
+        nxt.sort(priMoney?timePri:moneyPri);
+        for(DepartureNStopping ds:nxt){
+            Stopping start=ds.start,end=ds.stopping; Departure dep=ds.departure;
+            Route tmp=new Route(route);
+            tmp.append(dep,ds.date,start); tmp.pushEnd(end);
+            if(toDest.get(end.getStation())==1){res.add(tmp);routeFound++;lineVisited.add(ds.departure.getLine());return(res);}
+            List<Route> rest=dfs2(tmp,depth+1);
+            if(rest.size()!=0) {
+                res.addAll(rest);
+                lineVisited.add(ds.departure.getLine());
             }
         }
         return res;
     }
 
+
+
     private static class DepartureNStopping{
-        Departure departure; Date date; Stopping stopping;
-        DepartureNStopping(Departure departure, Date date,Stopping stopping) {
+        Departure departure; Date date; Stopping stopping,start;
+        DepartureNStopping(Departure departure, Date date,Stopping stopping,Stopping start) {
             this.departure = departure;
             this.date=date;
             this.stopping = stopping;
+            this.start=start;
         }
+        double moneySpent(){return stopping.getConstant()-start.getConstant();}
+        int timeSpent(){return stopping.getArrival()-start.getArrival();}
     }
     private List<DepartureNStopping> getValidDepartureInCity(Station station,java.sql.Date date,int startMin,int endMin){
         List<Station> stations=stationRepository.findByCity(station.getCity());
         List<DepartureNStopping> res=new ArrayList<>();
-        for(Station s:stations)
-            if (s.equals(station) || (station.getTransferId() != null && s.getTransferId().equals(station.getTransferId())))
-                res.addAll(getValidDeparture(s,date,startMin,endMin));
+        int curDis=toDest.get(station);
+        for(Station s:stations) {
+            Integer thisDis=toDest.get(s);
+            if(thisDis==null)continue; if(thisDis>curDis)continue;
+            if (s.equals(station))
+                res.addAll(getValidDeparture(s, date, startMin, endMin));
             else if (startMin + MIN_IN_CITY <= endMin)
-                res.addAll(getValidDeparture(s,date,startMin+MIN_IN_CITY,endMin));
+                res.addAll(getValidDeparture(s, date, startMin + MIN_IN_CITY, endMin));
+        }
         return res;
     }
     private List<DepartureNStopping> getValidDeparture(Station station,java.sql.Date date,int startMin,int endMin){
         if(endMin>24*60){//inter day
             List<DepartureNStopping> tmp=getValidDeparture(station,date,startMin,24*60);
-            tmp.addAll(getValidDeparture(station,CommonMethod.addByDay(date,1),0,endMin));
+            tmp.addAll(getValidDeparture(station,CommonMethod.addByDay(date,1),0,endMin%(24*60)));
             return tmp;
         }
         List<DepartureNStopping> res=new ArrayList<>();
-        List<Stopping> everyStopping=stoppingRepository.findByStation(station);//get all stoppings at this station
-        for(Stopping stp:everyStopping){
-            List<Departure> curDept=departureRepository.findByLine(stp.getLine());
-            for(Departure d:curDept) {
-                if (!isValid(d, stp, date)) continue;
-                int curMin = (d.getStart() + stp.getArrival()) % (24 * 60);
-                if (curMin >= startMin && curMin <= endMin) res.add(new DepartureNStopping(d,CommonMethod.addByDay(date,-(d.getStart()+stp.getArrival())/(24*60)),stp));
+        for(Station nxtSta:mapDest.get(station)){//find next lines with direction
+            List<Line> lines=lineRepository.findByOrderedStations(station.getId(),nxtSta.getId());
+            for(Line l:lines){
+                if(lineVisited.contains(l))continue;
+                List<Departure> curDept=departureRepository.findByLine(l);
+                Stopping stp=stoppingRepository.findLastByLineAndStation(l.getId(), nxtSta.getId()),cur=stoppingRepository.findFirstByLineAndStation(l.getId(),station.getId());
+                for(Departure d:curDept) {
+                    //if(lineVisited.contains(l))break;
+                    if (!isValid(d, cur, date)) continue;
+                    int curMin = (d.getStart() + cur.getArrival()) % (24 * 60);
+                    if (curMin >= startMin && curMin <= endMin){
+                        //lineVisited.add(l);
+                        res.add(new DepartureNStopping(d,CommonMethod.addByDay(date,-(d.getStart()+stp.getArrival())/(24*60)),stp,cur));
+                    }
+                }
             }
         }
         return res;
     }
-    private void initToDest(){
+    private Station initToDest(){
         toDest.clear();
+        mapDest.clear();
         for(Station s:to)toDest.put(s,1);
         List<Station> cur=new ArrayList<>(to),nxt;
-        for(int i=2;i<=MAX_TRANSFER;i++){
+        for(int i=2;i<=1+maxTrans;i++){//spread from destination
             nxt=new ArrayList<>();
             for(Station s:cur){//spread from every station
-                List<Stopping> stoppings=stoppingRepository.findByStation(s);
-                List<Line> lines=new ArrayList<>();
-                for(Stopping stop:stoppings)//init all lines via current station
-                    if(!lines.contains(stop.getLine()))lines.add(stop.getLine());
-                for(Line l:lines){//spread by lines
-                    List<Stopping> stops=stoppingRepository.findByLineOrderByOrderInLine(l);
-                    for(Stopping stop:stops){//spread if not visited
-                        Station curStation=stop.getStation();
-                        if(!toDest.containsKey(curStation)&&!nxt.contains(curStation))nxt.add(curStation);
+                List<Station> stations=stationRepository.findDirectStations(s.getId());
+                for(Station curStation:stations) {
+                    if(!toDest.containsKey(curStation)){
+                        if(!mapDest.containsKey(curStation))mapDest.put(curStation,new ArrayList<>());
+                        mapDest.get(curStation).add(s);
+                        if(!nxt.contains(curStation))nxt.add(curStation);
                     }
                 }
             }
             cur=nxt;
-            expand(cur);
-            for(Station s:cur)toDest.put(s,i);
+            int flag=-1;
+            for(Station s:cur){toDest.put(s,i);if(flag==-1&&from.contains(s))flag=from.indexOf(s);}
+            if(flag!=-1)return from.get(flag);
         }
+        Station ready=null;
+        for(Station s:from){//spread from origin
+            List<Station> stations=stationRepository.findDirectStations(s.getId());
+            for(Station sta:stations) {
+                if(from.contains(sta))continue;
+                if (toDest.containsKey(sta)) {
+                    ready = s;
+                    if (!toDest.containsKey(s)) {
+                        toDest.put(s, toDest.get(sta) + 1);
+                        mapDest.put(s, new ArrayList<>());
+                    }
+                    mapDest.get(s).add(sta);
+                }
+            }
+        }
+        return ready;
     }
 
-    private Station toMain(Station station){return station.getTransferId()==null?station:stationRepository.getById(station.getTransferId());}
-    private void expand(List<Station> stations){
-        List<Station> willAdd=new ArrayList<>();
-        for(Station s:stations)
-            if(s.getTransferId()!=null)
-                for(Station stat:stationRepository.findByTransferId(s.getTransferId()))
-                    if(!willAdd.contains(stat)&&!stations.contains(stat))willAdd.add(stat);
-        stations.addAll(willAdd);
-    }
+
+
     private boolean isValid(Departure departure,java.sql.Date curDate){
         Line line=departure.getLine();
         //Run date
@@ -312,7 +401,7 @@ public class TicketController {
             }else if(!line.isRegular())return false;
         //Holiday & Weekend
         boolean isHoliday=false,isWeekend=false;
-        for(CountryHoliday ch:countryHolidayRepository.findByCountry(stoppingRepository.findByLineAndOrderInLine(line,1).getStation().getCity().getProvince().getCountry())){
+        for(CountryHoliday ch:countryHolidayRepository.findByCountry(stoppingRepository.findFirstInLine(line.getId()).getStation().getCity().getProvince().getCountry())){
             Holiday h=ch.getHoliday();
             if(curDate.before(h.getEnd())&&curDate.after(h.getStart())){isHoliday=true;break;}
         }

@@ -70,7 +70,7 @@ public class InfoController {
 
     @PostMapping("/station")
     public DataResponse station(@Valid @RequestBody DataRequest dataRequest){
-        List<Station> stations= DataProcessor.filterStation(stationRepository.getAllBy());
+        List<Station> stations= (stationRepository.getAllBy());
         List data=new ArrayList();
         for(Station s:stations)
             data.add(CommonMethod.convertToMap(s));
@@ -80,7 +80,7 @@ public class InfoController {
     @PostMapping("/stationLike")
     public DataResponse stationLike(@Valid @RequestBody DataRequest dataRequest){
         String name=dataRequest.getString("name");
-        List<Station> stations=DataProcessor.filterStation(stationRepository.getStationsByNameLike("%"+name+"%"));
+        List<Station> stations=(stationRepository.getStationsByNameLike("%"+name+"%"));
         List data=new ArrayList();
         for(Station s:stations)
             data.add(CommonMethod.convertToMap(s));
@@ -90,7 +90,7 @@ public class InfoController {
     @PostMapping("/stationWithPos")
     public DataResponse stationWithPos(@Valid @RequestBody DataRequest dataRequest){
         String name=dataRequest.getString("name");
-        List<Station> stations=DataProcessor.filterStation(stationRepository.getStationsByNameLike("%"+name+"%"));
+        List<Station> stations=(stationRepository.getStationsByNameLike("%"+name+"%"));
         List data=new ArrayList();
         for(Station s:stations){
             Map m=new HashMap();

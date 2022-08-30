@@ -91,6 +91,9 @@ function getCityWithPos(data){
 function getStationWithPos(data){
     return generalRequest('/api/info/stationWithPos',data);
 }
+function queryRoute(data){
+    return generalRequest('/api/ticket/getTransferInfo',data)
+}
 
 //  company
 
@@ -120,4 +123,5 @@ export {
     getStationsLike,
     getStationWithPos,
     getCityWithPos,
+    queryRoute
 }

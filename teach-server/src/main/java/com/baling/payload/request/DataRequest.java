@@ -109,7 +109,6 @@ public class DataRequest {
     public java.sql.Date getDate(String key)  {
         try {
             Object obj = data.get(key);
-            System.out.println(obj);
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date date = format.parse((String) obj);

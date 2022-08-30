@@ -134,11 +134,14 @@ public class CommonMethod {
         Calendar c= Calendar.getInstance();
         c.setTime(origin);
         c.add(Calendar.DATE,delta);
-        return (Date) c.getTime();
+        return new Date(c.getTime().getTime());
     }
 
     public static String minToHourString(int min){
         return String.format("%02d:%02d",min/60,min%60);
+    }
+    public static String minToDHM(int min){
+        return min<24*60?minToHourString(min):String.format("+%d天 %s",min/(24*60),minToHourString(min%(24*60)) );
     }
 
     public static int numOfOnes(int status){

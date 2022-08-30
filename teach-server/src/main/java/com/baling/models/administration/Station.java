@@ -30,8 +30,7 @@ public class Station {
     @JoinColumn(name="city_id")
     private City city;
 
-    @Size(max = 20)
-    private String transferId;
+
 
     public String getId() {
         return id;
@@ -81,11 +80,4 @@ public class Station {
         this.city = city;
     }
 
-    public String getTransferId() {
-        return transferId;
-    }
-
-    public void setTransferId(String transferId) {
-        this.transferId = transferId;
-    }
 }

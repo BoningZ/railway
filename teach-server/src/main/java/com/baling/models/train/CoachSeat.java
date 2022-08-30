@@ -34,8 +34,8 @@ public class CoachSeat {
     private String cols;
 
     public int numOfSeats(){
-        if(cols.equals("顺序编号"))return rowsPosition;
         if(rowsPosition==-1)return -1;
+        if(cols.equals("顺序编号"))return rowsPosition;
         return CommonMethod.numOfOnes(rowsPosition)* cols.split(",|/").length;
     }
 
