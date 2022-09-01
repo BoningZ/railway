@@ -25,6 +25,10 @@ public class Currency {
     @NotNull
     private double toRmb;
 
+    public double toAnother(Currency another,double money){
+        return money*toRmb/another.toRmb;
+    }
+
     public String getId() {
         return id;
     }

@@ -52,6 +52,16 @@ const routes = [
     path: '/Booking',
     name:'Booking',
     component:()=>import('@/views/passenger/Booking')
+  },
+  {
+    path: '/EditTravel',
+    name:'EditTravel',
+    component:()=>import('@/views/passenger/EditTravel')
+  },
+  {
+    path: '/MyTravel',
+    name:'MyTravel',
+    component:()=>import('@/views/passenger/MyTravel')
   }
 ]
 

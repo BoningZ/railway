@@ -6,6 +6,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "coach_seat")
@@ -34,9 +38,17 @@ public class CoachSeat {
     private String cols;
 
     public int numOfSeats(){
-        if(rowsPosition==-1)return -1;
+        if(rowsPosition==-1)return coach.getMaxFreeCount();
         if(cols.equals("顺序编号"))return rowsPosition;
         return CommonMethod.numOfOnes(rowsPosition)* cols.split(",|/").length;
+    }
+
+    public List<List<String>> getColList(){
+        if(cols==null)return Collections.singletonList(Collections.singletonList("自由席"));
+        List<List<String>> res=new ArrayList<>();
+        for(String split:cols.split("/"))
+            res.add(Arrays.asList(split.split(",")));
+        return res;
     }
 
     public int getId() {

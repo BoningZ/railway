@@ -8,9 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CommonMethod {
     public static DataResponse getReturnData(Object obj, String msg){
@@ -140,6 +138,9 @@ public class CommonMethod {
     public static String minToHourString(int min){
         return String.format("%02d:%02d",min/60,min%60);
     }
+    public static String minToHourChinese(int min){
+        return String.format("%02d时%02d分",min/60,min%60);
+    }
     public static String minToDHM(int min){
         return min<24*60?minToHourString(min):String.format("+%d天 %s",min/(24*60),minToHourString(min%(24*60)) );
     }
@@ -149,6 +150,30 @@ public class CommonMethod {
         while(status>0){res+=status%2;status/=2;}
         return res;
     }
+    public static int getFirstOne(int status){
+        int res=1;
+        while(status%2==0){status/=2;res++;}
+        return res;
+    }
+    public static List<Integer> getNum(int status){
+        int tmp=0; List<Integer> res=new ArrayList<>();
+        while(status>0){
+            if(status%2==1)res.add(tmp+1);
+            status/=2;
+        }
+        return res;
+    }
+    public static int getWeekDay(Date date){
+        Calendar c=Calendar.getInstance();
+        c.setTime(date);
+        return c.get(Calendar.DAY_OF_WEEK);
+    }
+
+    public static double priceFormula(double kLine,double bLine,double kSeat,double bSeat,double bStop){
+        return kLine*(kSeat*bStop+bSeat)+bLine;
+    }
+
+
 
 
 

@@ -6,6 +6,7 @@ import com.baling.models.line.Stopping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public interface StoppingRepository extends JpaRepository<Stopping,Integer> {
@@ -23,5 +24,8 @@ public interface StoppingRepository extends JpaRepository<Stopping,Integer> {
     Stopping findLastByLineAndCity(String lineId,String cityId);
     @Query(value = "select * from stopping where line_id=?1 and station_id in (select id from station where city_id=?2) order by order_in_line asc limit 1",nativeQuery = true)
     Stopping findFirstByLineAndCity(String lineId,String cityId);
+
+    @Query(value = "select * from stopping where line_id=?1 and order_in_line>=?2 and order_in_line<=?3 order by order_in_line",nativeQuery = true)
+    List<Stopping> findBetween(String lineId,int o1,int o2);
 
 }

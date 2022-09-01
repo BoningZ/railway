@@ -77,21 +77,35 @@
               </el-main>
             </el-col>
           </el-row>
-          <el-label>出发日期：</el-label>
-          <el-date-picker
-              style="width: 40%;background-color: #f4f4f5"
-              v-model="startDate"
-              type="date"
-              placeholder="请选择出发日期"/>
+          <el-row>
+            <el-col :span="14">
+              <el-label>出发日期：</el-label>
+              <el-date-picker
+                  style="width: 40%;background-color: #f4f4f5"
+                  v-model="startDate"
+                  type="date"
+                  placeholder="请选择出发日期"/>
+            </el-col>
+            <el-col :span="10">
+              <el-label>出发时间：</el-label>
+              <el-select v-model="startTime" class="m-2" placeholder="选择出发时间" size="large">
+                <el-option
+                    v-for="o in 24"
+                    :key="o-1"
+                    :label="(o-1)+'时'"
+                    :value="o-1"/>
+              </el-select>
+            </el-col>
+          </el-row>
           <h3></h3>
-          <el-button style="width: 50%;" type="primary" @click="doQuery">查询车票</el-button>
+          <el-button style="width: 50%;" type="primary" @click="doQuery" :disabled="loadingTable">查询车票</el-button>
         </div>
       </el-col>
     </el-row>
   </el-form>
 
 
-  <el-table  class="table-content" :data="dataList" border style="width: 100%;"  height="5000">
+  <el-table v-loading="loadingTable" class="table-content" :data="dataList" border style="width: 100%;"  height="1000">
 
     <el-table-column label="序号" fixed="left" width="50" align="center" color="black">
       <template v-slot="scope">
@@ -99,10 +113,11 @@
       </template>
     </el-table-column><!--第一列-->
 
-    <el-table-column label="出发时间" align="center" color="black" sortable prop="start" /><!--courseNum-->
-    <el-table-column label="历时" align="center" color="black" sortable prop="duration" /><!--courseName-->
-    <el-table-column label="到达时间" align="center" color="black" sortable prop="end" />
-    <el-table-column prop="tag" label="车辆" :filters="typeList" :filter-method="filterTag" filter-placement="bottom-end">
+    <el-table-column label="出发时间" align="center" color="black" sortable prop="start" width="120" /><!--courseNum-->
+    <el-table-column label="历时" align="center" color="black" sortable prop="duration" width="120"/><!--courseName-->
+    <el-table-column label="到达时间" align="center" color="black" sortable prop="end" width="120"/>
+    <el-table-column label="路线" align="center" color="black" sortable prop="name" />
+    <el-table-column prop="tag" label="车辆" :filters="typeList" :filter-method="filterTag" width="240" filter-placement="bottom-end">
       <template #default="scope">
         <el-tag :type="scope.row.type === '普通客运火车' ? '' : 'success'" disable-transitions>{{ scope.row.type }}</el-tag>
       </template>
@@ -111,21 +126,35 @@
       <template #default="prop">
 
         <el-table :data="prop.row.lines" border size="mini">
-          <el-table-column label="路线" prop="lineName"/>
-          <el-table-column label="出发日期" prop="startDate"/>
-          <el-table-column label="出发时间" prop="startTime"/>
-          <el-table-column label="出发站" prop="startStation"/>
-          <el-table-column label="到达时间" prop="endTime"/>
-          <el-table-column label="到达站" prop="endStation"/>
-          <el-table-column type="expand">
+          <el-table-column label="路线" prop="lineName" width="150"/>
+          <el-table-column label="出发日期" prop="startDate" width="150"/>
+          <el-table-column label="出发时间" prop="startTime" width="100"/>
+          <el-table-column label="出发站" prop="startStation" width="100"/>
+          <el-table-column label="到达时间" prop="endTime" width="100"/>
+          <el-table-column label="到达站" prop="endStation" width="100"/>
+          <el-table-column label="经停" width="80">
+            <template #default="vias">
+              <el-popover placement="left" :width="300" trigger="hover">
+                <template #reference>
+                  <el-button size="mini">查看</el-button>
+                </template>
+                <el-table :data="vias.row.via" size="mini">
+                  <el-table-column label="车站" prop="name" width="100"/>
+                  <el-table-column label="到站" prop="arrival" width="100"/>
+                  <el-table-column label="经停" prop="stay" width="100"/>
+                </el-table>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column label="余票">
             <template #default="theLine">
-              <el-label>选座：  </el-label>
-              <el-button v-for="item in theLine.row.seats" v-bind:key="item">
-                {{item.name+" 剩余:"+item.rest}}
+              <el-button size="mini" v-for="item in theLine.row.seats" v-bind:key="item">
+                {{item.name+" 剩余:"+item.rest+"  价格："+item.price+item.currency}}
               </el-button>
             </template>
           </el-table-column>
         </el-table>
+        <div style="width: 20%;margin: auto"><el-button type="success" style="width: 80%;" @click="goPay(prop.row.routeId)">下单</el-button></div>
 
       </template>
     </el-table-column><!--编辑删除按钮-->
@@ -138,7 +167,7 @@
 <script>
 import Navi from '@/components/Navi'
 import {ref} from "vue";
-import {getStationWithPos,getCityWithPos,queryRoute} from "@/service/genServ";
+import {getStationWithPos,getCityWithPos,queryRoute,getTravel} from "@/service/genServ";
 import {ElMessage} from "element-plus";
 export default {
   name: "Booking",
@@ -157,14 +186,21 @@ export default {
       results:[],
       resultsTo:[],
       startDate:null,
+      startTime:0,
       maxTransfer:0,
       transferInCity:false,
       priority:"time",
       dataList:[],
-      typeList:[]
+      typeList:[],
+      loadingTable:false
     }
   },
   methods:{
+    goPay(routeId){
+      getTravel({'routeId':routeId}).then(res=>{
+        this.$router.push({path:'/EditTravel',query:{travelId:res.data.travelId}})
+      })
+    },
     filterTag(value,row){
       return row.type===value;
     },
@@ -223,6 +259,7 @@ export default {
       }else this.resultsTo=[];
     },
     doQuery(){
+      this.loadingTable=true;
       queryRoute({
         'fromRange':this.fromForm.fromRange,
         'toRange':this.toForm.toRange,
@@ -231,13 +268,15 @@ export default {
         'startDate':this.startDate,
         'maxTransfer':this.maxTransfer,
         'transferInCity':this.transferInCity,
-        'priority':this.priority}).then(res=>{
-        if(res.code!=='0')
-          ElMessage.error(res.msg);
-        else {
+        'priority':this.priority,
+        'startTime':this.startTime}).then(res=>{
+          this.loadingTable=false;
+          if(res.code!=='0')
+            ElMessage.error(res.msg);
+          else {
           this.dataList = res.data.table;
           this.typeList=res.data.type;
-        }
+          }
       })
     }
   }

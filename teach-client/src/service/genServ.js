@@ -94,6 +94,24 @@ function getStationWithPos(data){
 function queryRoute(data){
     return generalRequest('/api/ticket/getTransferInfo',data)
 }
+function getTravel(data){
+    return generalRequest('/api/ticket/getTravel',data)
+}
+function getTravelInfo(data){
+    return generalRequest('/api/ticket/getTravelInfo',data)
+}
+function payTravel(data){
+    return generalRequest('/api/ticket/payTravel',data)
+}
+function getFellowList(data){
+    return generalRequest('/api/fellow/getFellow',data)
+}
+function addFellow(data){
+    return generalRequest('/api/fellow/addFellow',data)
+}
+function getTravelList(data){
+    return generalRequest('/api/ticket/getTravelList',data)
+}
 
 //  company
 
@@ -123,5 +141,11 @@ export {
     getStationsLike,
     getStationWithPos,
     getCityWithPos,
-    queryRoute
+    queryRoute,
+    getTravel,
+    getTravelInfo,
+    payTravel,
+    getFellowList,
+    addFellow,
+    getTravelList
 }

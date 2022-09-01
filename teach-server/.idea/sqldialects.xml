@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/administration/StationRepository.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/LinePriceRepository.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/LineRepository.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/StoppingRepository.java" dialect="MySQL" />
   </component>

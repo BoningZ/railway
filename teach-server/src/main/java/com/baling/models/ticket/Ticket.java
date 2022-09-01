@@ -12,7 +12,7 @@ import java.sql.Date;
 
 @Entity
 @Table(name = "ticket")
-public class Ticket {
+public class Ticket implements Cloneable{
     @Id
     @Size(max = 20)
     private String id;
@@ -62,6 +62,15 @@ public class Ticket {
 
     @NotNull
     private int orderInTravel;
+
+    public Ticket clone(){
+        try {
+            return (Ticket) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public String getId() {
         return id;
