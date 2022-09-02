@@ -62,6 +62,11 @@ const routes = [
     path: '/MyTravel',
     name:'MyTravel',
     component:()=>import('@/views/passenger/MyTravel')
+  },
+  {
+    path: '/AlterTicket',
+    name:'AlterTicket',
+    component:()=>import('@/views/passenger/AlterTicket')
   }
 ]
 

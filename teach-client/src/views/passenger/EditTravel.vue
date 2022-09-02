@@ -6,7 +6,7 @@
         <el-col :span="2">
           <el-tag size="large" type="danger" v-show="item.status==='UNPAID'">{{"行程"+(index+1)+":未支付"}}</el-tag>
           <el-tag size="large" type="info" v-show="item.status==='QUEUEING'">{{"行程"+(index+1)+":候补中"}}</el-tag>
-          <el-tag size="large" type="success" v-show="item.status==='SUCCEEDED'">{{"行程"+(index+1)+":成功"}}</el-tag>
+          <el-tag size="large" type="success" v-show="item.status==='SUCCEEDED'">{{"行程"+(index+1)+":成功 "+item.price+"元"}}</el-tag>
           <el-tag size="large" type="danger" v-show="(item.status==='SUCCEEDED'||item.status==='QUEUEING')&&item.altered>0">{{"改签次数："+item.altered}}</el-tag>
           <el-tag size="large" type="warning" v-show="item.status==='CANCELED'">{{"行程"+(index+1)+":被取消"}}</el-tag>
           <el-tag size="large"  v-show="item.status==='REFUNDED'">{{"行程"+(index+1)+":已退款"}}</el-tag>
@@ -80,10 +80,10 @@
           <el-row style="margin-top: 10px">
             <el-col :span="16"></el-col>
             <el-col :span="4">
-              <el-button type="warning" size="large" style="width: 80%;" @click="alter" plain>改签</el-button>
+              <el-button type="warning" size="large" style="width: 80%;" @click="alter(item.id)" plain>改签</el-button>
             </el-col>
             <el-col :span="4">
-              <el-button type="danger" size="large" style="width: 80%;" @click="refund" plain>退票</el-button>
+              <el-button type="danger" size="large" style="width: 80%;" @click="refund(item.id)" plain>退票</el-button>
             </el-col>
           </el-row>
         </div>
@@ -120,10 +120,21 @@
   </div>
   <div style="width: 20%;margin: auto" v-show="this.status===0"><el-button type="success" style="width: 80%;margin-top: 10px" @click="goPay">{{this.price()+"元 支付"}}</el-button></div>
 
+
+  <el-dialog v-model="refundDialog" title="退款信息" width="30%">
+    <span>{{refundMsg}}</span>
+    <template #footer>
+      <span>
+        <el-button @click="refundDialog=false">取消</el-button>
+        <el-button type="primary" @click="confirmRefund" v-show="okToRefund">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script>
-import {getTravelInfo, payTravel, getFellowList, getCountries,addFellow} from "@/service/genServ";
+import {getTravelInfo, payTravel, getFellowList, getCountries, addFellow, getRefundInfo,refund} from "@/service/genServ";
 import Navi from '@/components/Navi'
 import {ElMessage} from "element-plus";
 export default {
@@ -142,8 +153,14 @@ export default {
       seatSingle:[],
       fellowList:[],
       fellowChoice:[],
+      priceList:[],
       countries:[],
-      loading:false
+      loading:false,
+
+      refundDialog:false,
+      refundMsg:"",
+      okToRefund:false,
+      refundingId:""
     }
   },
   created() {
@@ -172,7 +189,11 @@ export default {
       var res=0;
       for(var i=0;i<this.dataList.length;i++)
         for(var j=0;j<this.dataList[i].seats.length;j++)
-          if(this.dataList[i].seats[j].id===this.seatSingle[i])res+=Number(this.dataList[i].seats[j].price);
+          if(this.dataList[i].seats[j].id===this.seatSingle[i]){
+            var price=Number(this.dataList[i].seats[j].price);
+            res+=price;
+            this.priceList[i]=price;
+          }
       res*=(this.fellowChoice.length+1);
       return res.toFixed(2);
     },
@@ -199,6 +220,7 @@ export default {
       payTravel({'seatList':this.seatSingle,
                       'colList':this.colChoice,
                       'travelId':this.travelId,
+                      'priceList':this.priceList,
                       'fellowList':processedFellows}).then(res=>{
         if(res.code!=='0')
           ElMessage.error(res.msg)
@@ -208,11 +230,25 @@ export default {
         }
       })
     },
-    alter(){
-
+    alter(ticketId){
+      this.$router.push({path:'/AlterTicket',query:{ticketId:ticketId}});
     },
-    refund(){
-
+    refund(ticketId){
+      getRefundInfo({'ticketId':ticketId}).then(res=>{
+        this.refundMsg=res.data.refundMsg;
+        this.okToRefund=res.data.okToRefund;
+        this.refundingId=ticketId;
+        this.refundDialog=true;
+      })
+    },
+    confirmRefund(){
+      refund({'ticketId':this.refundingId}).then(res=>{
+        if(res.code==='0'){
+          ElMessage.success('退款成功');
+          this.$router.go(0);
+        }else ElMessage.error(res.msg)
+        this.refundDialog=false;
+      })
     }
   }
 

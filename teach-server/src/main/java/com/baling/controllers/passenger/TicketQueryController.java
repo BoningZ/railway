@@ -1,5 +1,7 @@
 package com.baling.controllers.passenger;
 
+import com.baling.models.administration.City;
+import com.baling.models.administration.CompanyRefund;
 import com.baling.models.administration.Currency;
 import com.baling.models.administration.Station;
 import com.baling.models.holiday.CountryHoliday;
@@ -13,6 +15,7 @@ import com.baling.models.user.Passenger;
 import com.baling.payload.request.DataRequest;
 import com.baling.payload.response.DataResponse;
 import com.baling.repository.administration.CityRepository;
+import com.baling.repository.administration.CompanyRefundRepository;
 import com.baling.repository.administration.StationRepository;
 import com.baling.repository.holiday.CountryHolidayRepository;
 import com.baling.repository.line.*;
@@ -26,6 +29,7 @@ import com.baling.repository.user.PassengerRepository;
 import com.baling.repository.user.UserRepository;
 import com.baling.util.CommonMethod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,6 +73,8 @@ public class TicketQueryController {
     SeatRepository seatRepository;
     @Autowired
     LinePriceRepository linePriceRepository;
+    @Autowired
+    CompanyRefundRepository companyRefundRepository;
 
     @PostMapping("/getTransferInfo")
     @PreAuthorize("hasRole('PASSENGER')")
@@ -89,41 +95,33 @@ public class TicketQueryController {
             case "station":to= Collections.singletonList(stationRepository.getById(toId));toCity=false;break;
         }
         startDate=dataRequest.getDate("startDate");
+
+
         routes=getRoutes();
         if(routes.size()==0)return CommonMethod.getReturnMessageError("无法找到路径");
+        return CommonMethod.getReturnData(routeWrapper(passenger));
+    }
 
-        List dataList=new ArrayList();
-        List<String> typeList=new ArrayList();
-        List typeFliter=new ArrayList();
-        for(Route r:routes){
-            Map mRoute=new HashMap();
-            int startTime=(r.startList.get(0).getArrival()+r.departureList.get(0).getStart())%(24*60);
-            mRoute.put("start",CommonMethod.minToHourString(startTime));
-            mRoute.put("duration",CommonMethod.minToHourChinese(r.minSpent+r.daySpent*24*60-startTime));
-            mRoute.put("end",(r.daySpent>0?("+"+r.daySpent+"天  "):"")+CommonMethod.minToHourString(r.minSpent));
-            mRoute.put("name",r.getName());
-            mRoute.put("routeId",routes.indexOf(r));
-            String type=r.getType();
-            mRoute.put("type",type);
-            if(!typeList.contains(type)){
-                typeList.add(type);
-                Map mmm=new HashMap();
-                mmm.put("text",type); mmm.put("value",type);
-                typeFliter.add(mmm);
-            }
-            List inRoute=new ArrayList();
-            for(int i=0;i<r.departureList.size();i++){
-                Departure departure=r.departureList.get(i);
-                Date departureDate=r.departureDateList.get(i);
-                Stopping start=r.startList.get(i),end=r.endList.get(i);
-                inRoute.add(getLineInfo(departure,start,end,departureDate,passenger.getCountry().getCurrency()));
-            }
-            mRoute.put("lines",inRoute);
-            dataList.add(mRoute);
-        }
-        Map finalRes=new HashMap();
-        finalRes.put("table",dataList); finalRes.put("type",typeFliter);
-        return CommonMethod.getReturnData(finalRes);
+    @PostMapping("/getAlterRoutes")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public DataResponse getAlterRoutes(@Valid @RequestBody DataRequest dataRequest){
+        Passenger passenger=passengerRepository.findByUser(userRepository.findByUserId(CommonMethod.getUserId()).get());
+        maxTrans=0;fromCity=toCity=true;
+        startDate=dataRequest.getDate("startDate");
+        startTime=dataRequest.getInteger("startTime");
+        allowedInCity=dataRequest.getBoolean("transferInCity");
+        priMoney=dataRequest.getString("priority").equals("money");
+        Ticket ticket=ticketRepository.getById(dataRequest.getString("ticketId"));
+        City cityFrom=stoppingRepository.findByLineAndOrderInLine(ticket.getDeparture().getLine(),ticket.getStart()).getStation().getCity(),
+                cityTo=stoppingRepository.findByLineAndOrderInLine(ticket.getDeparture().getLine(),ticket.getEnd()).getStation().getCity();
+        from=stationRepository.findByCity(cityFrom); to=stationRepository.findByCity(cityTo);
+        fromId=cityFrom.getId(); toId=cityTo.getId();
+
+        routes=getRoutes();
+        if(routes.size()==0)return CommonMethod.getReturnMessageError("无法找到路径");
+        Map routeInfos=routeWrapper(passenger);
+        routeInfos.put("price",ticket.getPrice());
+        return CommonMethod.getReturnData(routeInfos);
     }
 
     @PostMapping("/getTravel")
@@ -138,7 +136,7 @@ public class TicketQueryController {
         travelRepository.save(travel);
         for(int i=0;i<route.departureList.size();i++){
             Ticket ticket=new Ticket();
-            ticket.setId((cur.getId().substring(0,4)+(new java.util.Date()).toString().substring(12,14)+route.departureList.get(i).getId().substring(3)+"##################").substring(0,19).replace(' ','-'));
+            ticket.setId((cur.getId().substring(0,4)+(new java.util.Date()).toString().substring(12,14)+route.departureList.get(i).getId().substring(3)+"endOfQuoteRndOfQuoteEndOfQuote").substring(0,19).replace(' ','-'));
             ticket.setTravel(travel);
             ticket.setTicketStatus(ticketStatusRepository.getByName(ETicketStatus.UNPAID));
             ticket.setAltered(0);
@@ -160,6 +158,9 @@ public class TicketQueryController {
     @PostMapping("/payTravel")
     @PreAuthorize("hasRole('PASSENGER')")
     public DataResponse payTravel(@Valid @RequestBody DataRequest dataRequest){
+        Passenger passenger=passengerRepository.findByUser(userRepository.findByUserId(CommonMethod.getUserId()).get());
+        Currency pCurrency=passenger.getCountry().getCurrency();
+        List<Double> priceList=dataRequest.getList("priceList");
         List<String> seatIdList=dataRequest.getList("seatList");
         List<Seat> seatList=new ArrayList<>();
         for(String seatId:seatIdList){seatList.add(seatRepository.getById(seatId));}
@@ -189,6 +190,10 @@ public class TicketQueryController {
         boolean notMatched=false,failed=false;
         for(Ticket t:readyToAdd){
             int order=t.getOrderInTravel();
+
+            Currency tCurrency=t.getTravel().getPassenger().getCountry().getCurrency();
+            t.setPrice(tCurrency.equals(pCurrency)?priceList.get(order):pCurrency.toAnother(tCurrency,priceList.get(order)));
+
             ETicketStatus result;
             if(assignForTicket(t,seatList.get(order),colList.get(order),0))result=ETicketStatus.SUCCEEDED;
             else {
@@ -201,7 +206,7 @@ public class TicketQueryController {
         }
         String returnMessage="";
         if(!(notMatched||failed))returnMessage="您所选所有座位余票充足";
-        if(notMatched)returnMessage="您所选座位余票不足，已自动分配";
+        if(notMatched)returnMessage="您有所选座位余票不足，已自动分配";
         if(failed)returnMessage+="   有订单需要候补";
         return CommonMethod.getReturnMessageOK(returnMessage);
     }
@@ -216,6 +221,7 @@ public class TicketQueryController {
         for(Ticket t:tickets){
             Map curT=new HashMap();
             curT.put("id",t.getId());
+            curT.put("price",t.getPrice());
             curT.put("coachNum",t.getCoachNum());
             curT.put("altered",t.getAltered());
             if(t.getCol()!=null&&!t.getCol().equals("自由席")) {
@@ -238,8 +244,115 @@ public class TicketQueryController {
         return CommonMethod.getReturnData(resM);
     }
 
+    @PostMapping("/alterTicket")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public DataResponse alterTicket(@Valid @RequestBody DataRequest dataRequest){
+        Route route=routes.get(dataRequest.getInteger("routeId"));
+        Double price=dataRequest.getDouble("price");
+        Seat seat=seatRepository.getById(dataRequest.getString("seatId"));
+        Ticket ticket=ticketRepository.getById(dataRequest.getString("ticketId"));
+        String col=dataRequest.getString("col");
+
+        if(ticket.getAltered()>=ticket.getDeparture().getLine().getCompany().getMaxAlter())return CommonMethod.getReturnMessageError("已超过该公司改签上限！");
+        if(!okToEdit(ticket))return CommonMethod.getReturnMessageError("超过发车时间，不允许改签");
+        ticket.setAltered(ticket.getAltered()+1);
+        ticket.setDeparture(route.departureList.get(0));
+        ticket.setStart(route.startList.get(0).getOrderInLine());
+        ticket.setEnd(route.endList.get(0).getOrderInLine());
+        ticket.setStartDate(route.departureDateList.get(0));
+        ticket.setPrice(price);
+
+        boolean notMatched=false,failed=false;
+        ETicketStatus result;
+        if(assignForTicket(ticket,seat,col,0))result=ETicketStatus.SUCCEEDED;
+        else {
+            notMatched=true;
+            if(assignForTicket(ticket,seat,null,0))result=ETicketStatus.SUCCEEDED;
+            else {failed=true; result=ETicketStatus.QUEUEING;}
+        }
+        ticket.setTicketStatus(ticketStatusRepository.getByName(result));
+        ticketRepository.save(ticket);
+
+        String returnMessage="";
+        if(!(notMatched||failed))returnMessage="您所选座位余票充足";
+        if(notMatched)returnMessage="您所选座位余票不足，已自动分配";
+        if(failed)returnMessage+="   订单需要候补";
+        return CommonMethod.getReturnMessageOK(returnMessage);
+    }
+
+    @PostMapping("/getRefundInfo")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public DataResponse getRefundInfo(@Valid @RequestBody DataRequest dataRequest){
+        Ticket ticket=ticketRepository.getById(dataRequest.getString("ticketId"));
+        Map res=new HashMap();
+        if(ticket.getTicketStatus().equals(ticketStatusRepository.getByName(ETicketStatus.CANCELED))){
+            res.put("refundMsg","可全额退款");
+            res.put("okToRefund",true);
+            return CommonMethod.getReturnData(res);
+        }
+        if(!okToEdit(ticket)){
+            res.put("refundMsg","已过开车时间，不可退票");
+            res.put("okToRefund",false);
+            return CommonMethod.getReturnData(res);
+        }
+        List<CompanyRefund> policies=companyRefundRepository.findByCompanyOrderByLeftHour(ticket.getDeparture().getLine().getCompany());
+        int leftHour=CommonMethod.hourBetween(new java.util.Date(),getDeadline(ticket));
+        double ratio=0;
+        for(CompanyRefund cr:policies)
+            if(cr.getLeftHour()<leftHour)ratio=cr.getRatio();
+            else break;
+        res.put("refundMsg","可退金额："+String.format("%.2f",ticket.getPrice()*ratio));
+        res.put("okToRefund",true);
+        return CommonMethod.getReturnData(res);
+    }
+
+    @PostMapping("/refund")
+    @PreAuthorize("hasRole('PASSENGER')")
+    public DataResponse refund(@Valid @RequestBody DataRequest dataRequest) {
+        Ticket ticket = ticketRepository.getById(dataRequest.getString("ticketId"));
+        ticket.setTicketStatus(ticketStatusRepository.getByName(ETicketStatus.REFUNDED));
+        ticketRepository.save(ticket);
+        return CommonMethod.getReturnMessageOK();
+    }
+
+
+
 
     //get info
+    private Map routeWrapper(Passenger passenger){
+        List dataList=new ArrayList();
+        List<String> typeList=new ArrayList();
+        List typeFilter=new ArrayList();
+        for(Route r:routes){
+            Map mRoute=new HashMap();
+            int startTime=(r.startList.get(0).getArrival()+r.departureList.get(0).getStart())%(24*60);
+            mRoute.put("start",CommonMethod.minToHourString(startTime));
+            mRoute.put("duration",CommonMethod.minToHourChinese(r.minSpent+r.daySpent*24*60-startTime));
+            mRoute.put("end",(r.daySpent>0?("+"+r.daySpent+"天  "):"")+CommonMethod.minToHourString(r.minSpent));
+            mRoute.put("name",r.getName());
+            mRoute.put("routeId",routes.indexOf(r));
+            String type=r.getType();
+            mRoute.put("type",type);
+            if(!typeList.contains(type)){
+                typeList.add(type);
+                Map mmm=new HashMap();
+                mmm.put("text",type); mmm.put("value",type);
+                typeFilter.add(mmm);
+            }
+            List inRoute=new ArrayList();
+            for(int i=0;i<r.departureList.size();i++){
+                Departure departure=r.departureList.get(i);
+                Date departureDate=r.departureDateList.get(i);
+                Stopping start=r.startList.get(i),end=r.endList.get(i);
+                inRoute.add(getLineInfo(departure,start,end,departureDate,passenger.getCountry().getCurrency()));
+            }
+            mRoute.put("lines",inRoute);
+            dataList.add(mRoute);
+        }
+        Map finalRes=new HashMap();
+        finalRes.put("table",dataList); finalRes.put("type",typeFilter);
+        return finalRes;
+    }
     private Map getLineInfo(Departure departure, Stopping start, Stopping end, Date date, Currency currency){
         Map lineInfo=new HashMap();
         lineInfo.put("via",getVia(start,end,departure));
@@ -298,7 +411,7 @@ public class TicketQueryController {
     }
     private double getPrice(Departure departure,Stopping start,Stopping end,Seat seat,Date date){
         Line line=departure.getLine();
-        int week=1<<(CommonMethod.getWeekDay(date)-1),day=departure.getStart()/60;
+        int week=1<<(CommonMethod.getWeekDay(date)-1),day=1<<(departure.getStart()/60);
         List<LinePrice> lps=null;
         if(judgeHoliday(line,date))lps=linePriceRepository.getByLineAndDayAndWeekAndHoliday(line.getId(),day,week,true);
         if(lps==null)lps=linePriceRepository.getByLineAndDayAndWeekAndHoliday(line.getId(),day,week,false);
@@ -353,14 +466,22 @@ public class TicketQueryController {
         ticket.setRowPosition(row);
     }
     private int getAvailableRow(Ticket ticket,Seat seat,String col,int coachNum){
+        Coach curCoach=trainCoachRepository.nativeFindByTrainIdAndPositionBit(ticket.getDeparture().getLine().getTrain().getId(),1<<(coachNum-1)).getCoach();
+        List<CoachSeat> coachSeat=coachSeatRepository.findByCoachAndSeatAndAndColsContains(curCoach,seat,col);
+        List<Integer> availableRow=new ArrayList<>();
+        for(CoachSeat cs:coachSeat)availableRow.addAll(CommonMethod.getNum(cs.getRowsPosition()));
         List<Ticket> tickets=ticketRepository.findByDepartureAndStartDateAndTicketStatusAndSeatAndColAndCoachNumAndStartLessThanAndEndGreaterThanOrderByRowPosition(ticket.getDeparture(),ticket.getStartDate(),ticketStatusRepository.getByName(ETicketStatus.SUCCEEDED),seat,col,coachNum,ticket.getEnd(),ticket.getStart());
-        if(tickets.size()==0)return 1;
-        int pre=0;
-        for(Ticket t:tickets)
-            if (t.getRowPosition() > pre + 1) return pre + 1;
-            else pre = t.getRowPosition();
-
-        return pre+1;
+        if(col.equals("顺序编号")){
+            int res=0;
+            for(Ticket t:tickets)
+                if(t.getRowPosition()>res+1)return res+1;
+                else res=t.getRowPosition();
+            return 1;
+        }
+        int occupied=0;
+        for(Ticket t:tickets)occupied|=(1<<(t.getRowPosition()-1));
+        for(int pos:availableRow)if((occupied&(1<<(pos-1)))==0)return pos;
+        return 0;
     }
     private int getBought(Ticket ticket,Seat seat,String col,int coachNum){
         int res=0;
@@ -373,6 +494,17 @@ public class TicketQueryController {
         }
         return res;
     }
+
+    //refund or alter check
+    private boolean okToEdit(Ticket ticket){
+        return (new java.util.Date()).before(getDeadline(ticket));
+    }
+    private java.util.Date getDeadline(Ticket ticket){
+        Stopping first=stoppingRepository.findByLineAndOrderInLine(ticket.getDeparture().getLine(),ticket.getStart());
+        return CommonMethod.addByMin(ticket.getStartDate(),ticket.getDeparture().getStart()+first.getArrival());
+    }
+
+
 
 
 

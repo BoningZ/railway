@@ -5,5 +5,7 @@
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/LinePriceRepository.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/LineRepository.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/line/StoppingRepository.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/train/CoachSeatRepository.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/baling/repository/train/TrainCoachRepository.java" dialect="MySQL" />
   </component>
 </project>

@@ -30,6 +30,8 @@ public class PassengerDiscount {
 
     private java.sql.Date expire;
 
+    private int usedTime;
+
     public int getId() {
         return id;
     }
@@ -68,5 +70,13 @@ public class PassengerDiscount {
 
     public void setExpire(Date expire) {
         this.expire = expire;
+    }
+
+    public int getUsedTime() {
+        return usedTime;
+    }
+
+    public void setUsedTime(int usedTime) {
+        this.usedTime = usedTime;
     }
 }

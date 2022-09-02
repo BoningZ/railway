@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CommonMethod {
     public static DataResponse getReturnData(Object obj, String msg){
@@ -134,6 +135,16 @@ public class CommonMethod {
         c.add(Calendar.DATE,delta);
         return new Date(c.getTime().getTime());
     }
+    public static java.util.Date addByMin(java.sql.Date origin,int delta) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(origin);
+        c.add(Calendar.MINUTE, delta);
+        return c.getTime();
+    }
+    public static int hourBetween(java.util.Date d1, java.util.Date d2){
+        long diffMillis=Math.abs(d1.getTime()-d2.getTime());
+        return (int) TimeUnit.HOURS.convert(diffMillis,TimeUnit.MILLISECONDS);
+    }
 
     public static String minToHourString(int min){
         return String.format("%02d:%02d",min/60,min%60);
@@ -159,7 +170,7 @@ public class CommonMethod {
         int tmp=0; List<Integer> res=new ArrayList<>();
         while(status>0){
             if(status%2==1)res.add(tmp+1);
-            status/=2;
+            status/=2; tmp++;
         }
         return res;
     }

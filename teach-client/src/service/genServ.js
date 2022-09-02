@@ -112,6 +112,18 @@ function addFellow(data){
 function getTravelList(data){
     return generalRequest('/api/ticket/getTravelList',data)
 }
+function alterTicket(data){
+    return generalRequest('/api/ticket/alterTicket',data)
+}
+function getAlterRoutes(data){
+    return generalRequest('/api/ticket/getAlterRoutes',data)
+}
+function getRefundInfo(data){
+    return generalRequest('/api/ticket/getRefundInfo',data);
+}
+function refund(data){
+    return generalRequest('/api/ticket/refund',data);
+}
 
 //  company
 
@@ -147,5 +159,9 @@ export {
     payTravel,
     getFellowList,
     addFellow,
-    getTravelList
+    getTravelList,
+    alterTicket,
+    getAlterRoutes,
+    getRefundInfo,
+    refund
 }
