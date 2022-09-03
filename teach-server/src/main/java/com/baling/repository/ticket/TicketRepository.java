@@ -14,5 +14,6 @@ public interface TicketRepository extends JpaRepository<Ticket,String> {
     List<Ticket> findByDepartureAndStartDateAndTicketStatusAndSeatAndStartLessThanAndEndGreaterThan(Departure departure, Date startDate, TicketStatus ticketStatus,Seat seat,int end,int start);
     int countByDepartureAndStartDateAndTicketStatusAndSeatAndStartLessThanAndEndGreaterThan(Departure departure, Date startDate, TicketStatus ticketStatus, Seat seat,int end,int start);
     List<Ticket> findByDepartureAndStartDateAndTicketStatusAndSeatAndColAndCoachNumAndStartLessThanAndEndGreaterThanOrderByRowPosition(Departure departure, Date startDate,TicketStatus ticketStatus,Seat seat,String col,int coachNum,int end,int start);
+    List<Ticket> findByDepartureAndStartDateAndTicketStatusAndSeat(Departure departure,Date startDate,TicketStatus ticketStatus,Seat seat);
     List<Ticket> findByTravelOrderByOrderInTravel(Travel travel);
 }

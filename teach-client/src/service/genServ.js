@@ -124,6 +124,24 @@ function getRefundInfo(data){
 function refund(data){
     return generalRequest('/api/ticket/refund',data);
 }
+function getSeatTable(data){
+    return generalRequest('/api/seat/getSeatTable',data);
+}
+function submitSeat(data){
+    return generalRequest('/api/seat/submitSeat',data)
+}
+function newSeat(data){
+    return generalRequest('/api/seat/newSeat',data)
+}
+function getCoachTable(data){
+    return generalRequest('/api/coach/getCoachTable',data);
+}
+function getCoachInfo(data){
+    return generalRequest('/api/coach/getCoachInfo',data)
+}
+function submitCoach(data){
+    return generalRequest('/api/coach/submitCoach',data)
+}
 
 //  company
 
@@ -163,5 +181,11 @@ export {
     alterTicket,
     getAlterRoutes,
     getRefundInfo,
-    refund
+    refund,
+    getSeatTable,
+    submitSeat,
+    newSeat,
+    getCoachTable,
+    getCoachInfo,
+    submitCoach
 }

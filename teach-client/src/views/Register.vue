@@ -203,6 +203,7 @@ export default {
           message:  '口令不一致！',
           type: 'warning',
         })
+        return;
       }if(!this.checkCompleteness()){
         this.$message({
           message:  '所有项目均为必填项！',

@@ -6,7 +6,7 @@
         <el-col :span="2">
           <el-tag size="large" type="danger" v-show="item.status==='UNPAID'">{{"行程"+(index+1)+":未支付"}}</el-tag>
           <el-tag size="large" type="info" v-show="item.status==='QUEUEING'">{{"行程"+(index+1)+":候补中"}}</el-tag>
-          <el-tag size="large" type="success" v-show="item.status==='SUCCEEDED'">{{"行程"+(index+1)+":成功 "+item.price+"元"}}</el-tag>
+          <el-tag size="large" type="success" v-show="item.status==='SUCCEEDED'">{{"行程"+(index+1)+":成功 "+item.price.toFixed(2)+"元"}}</el-tag>
           <el-tag size="large" type="danger" v-show="(item.status==='SUCCEEDED'||item.status==='QUEUEING')&&item.altered>0">{{"改签次数："+item.altered}}</el-tag>
           <el-tag size="large" type="warning" v-show="item.status==='CANCELED'">{{"行程"+(index+1)+":被取消"}}</el-tag>
           <el-tag size="large"  v-show="item.status==='REFUNDED'">{{"行程"+(index+1)+":已退款"}}</el-tag>

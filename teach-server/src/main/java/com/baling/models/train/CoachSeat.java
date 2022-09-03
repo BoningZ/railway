@@ -21,13 +21,11 @@ public class CoachSeat {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "coach_id")
-    @Size(max = 20)
     private Coach coach;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "seat_id")
-    @Size(max = 20)
     private Seat seat;
 
 
@@ -43,12 +41,17 @@ public class CoachSeat {
         return CommonMethod.numOfOnes(rowsPosition)* cols.split(",|/").length;
     }
 
-    public List<List<String>> getColList(){
+    public List<List<String>> getColList(){//[ [[A],[B],[C]] , [[D],[E]] ]
         if(cols==null)return Collections.singletonList(Collections.singletonList("自由席"));
         List<List<String>> res=new ArrayList<>();
         for(String split:cols.split("/"))
             res.add(Arrays.asList(split.split(",")));
         return res;
+    }
+
+    public List<String> getSoundColList(){//[ [A,B,C],[D,E] ]
+        if(cols==null)return null;
+        return Arrays.asList(cols.split("/"));
     }
 
     public int getId() {

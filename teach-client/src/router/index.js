@@ -67,6 +67,21 @@ const routes = [
     path: '/AlterTicket',
     name:'AlterTicket',
     component:()=>import('@/views/passenger/AlterTicket')
+  },
+  {
+    path: '/SeatTable',
+    name:'SeatTable',
+    component:()=>import('@/views/trainAdmin/SeatTable')
+  },
+  {
+    path: '/CoachTable',
+    name:'CoachTable',
+    component:()=>import('@/views/trainAdmin/CoachTable')
+  },
+  {
+    path: '/CoachEdit',
+    name:'CoachEdit',
+    component:()=>import('@/views/trainAdmin/CoachEdit')
   }
 ]
 

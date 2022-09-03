@@ -16,13 +16,11 @@ public class TrainCoach {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "train_id")
-    @Size(max = 20)
     private Train train;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "coach_id")
-    @Size(max = 20)
     private Coach coach;
 
     @NotNull

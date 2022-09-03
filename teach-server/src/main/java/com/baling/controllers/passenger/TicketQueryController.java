@@ -199,7 +199,11 @@ public class TicketQueryController {
             else {
                 notMatched=true;
                 if(assignForTicket(t,seatList.get(order),null,0))result=ETicketStatus.SUCCEEDED;
-                    else {failed=true; result=ETicketStatus.QUEUEING;}
+                    else {
+                        failed=true;
+                        t.setSeat(seatList.get(order)); t.setCol(colList.get(order));//ready for re-assign
+                        result=ETicketStatus.QUEUEING;
+                    }
             }
             t.setTicketStatus(ticketStatusRepository.getByName(result));
             ticketRepository.save(t);
@@ -312,6 +316,12 @@ public class TicketQueryController {
         Ticket ticket = ticketRepository.getById(dataRequest.getString("ticketId"));
         ticket.setTicketStatus(ticketStatusRepository.getByName(ETicketStatus.REFUNDED));
         ticketRepository.save(ticket);
+        List<Ticket> queueingTickets=ticketRepository.findByDepartureAndStartDateAndTicketStatusAndSeat(ticket.getDeparture(),ticket.getStartDate(),ticketStatusRepository.getByName(ETicketStatus.QUEUEING),ticket.getSeat());
+        for(Ticket qt:queueingTickets)
+            if (assignForTicket(qt, qt.getSeat(), qt.getCol(), 0)){
+                ticketRepository.save(qt);
+                break;
+            }
         return CommonMethod.getReturnMessageOK();
     }
 

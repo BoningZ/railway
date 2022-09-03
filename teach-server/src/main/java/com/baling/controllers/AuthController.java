@@ -150,6 +150,7 @@ public class AuthController {
                 userRepository.save(user);
                 adminCountry.setUser(user);
                 adminCountryRepository.save(adminCountry);
+                break;
             case ROLE_ADMIN_COMPANY:
                 if(adminCompanyRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
                 String companyId=signUpRequest.getString("company");
@@ -160,6 +161,7 @@ public class AuthController {
                 userRepository.save(user);
                 adminCompany.setUser(user);
                 adminCompanyRepository.save(adminCompany);
+                break;
             case ROLE_ADMIN_STATION:
                 if(adminStationRepository.existsById(signUpRequest.getString("tid")))return CommonMethod.getReturnMessageError("该工号已被注册！");
                 String stationId=signUpRequest.getString("station");
@@ -170,6 +172,7 @@ public class AuthController {
                 userRepository.save(user);
                 adminStation.setUser(user);
                 adminStationRepository.save(adminStation);
+                break;
         }
         return CommonMethod.getReturnMessageOK();
     }

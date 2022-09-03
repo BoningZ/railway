@@ -174,6 +174,13 @@ public class CommonMethod {
         }
         return res;
     }
+
+    public static int getStatus(List<Integer> num){
+        int res=0;
+        for(int bit:num)res|=(1<<(bit-1));
+        return res;
+    }
+
     public static int getWeekDay(Date date){
         Calendar c=Calendar.getInstance();
         c.setTime(date);

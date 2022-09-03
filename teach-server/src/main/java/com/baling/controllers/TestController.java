@@ -65,7 +65,6 @@ public class TestController {
         ));
     }
     @PostMapping("/getMenuList")
-    @PreAuthorize("hasRole('PASSENGER') or hasRole('ADMIN')")
     public DataResponse getMenuList(@Valid @RequestBody DataRequest dataRequest) {
         Integer userId= CommonMethod.getUserId();
         User user;
