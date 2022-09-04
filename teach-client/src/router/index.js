@@ -82,6 +82,16 @@ const routes = [
     path: '/CoachEdit',
     name:'CoachEdit',
     component:()=>import('@/views/trainAdmin/CoachEdit')
+  },
+  {
+    path: '/TrainTable',
+    name:'TrainTable',
+    component:()=>import('@/views/trainAdmin/TrainTable')
+  },
+  {
+    path: '/TrainEdit',
+    name:'TrainEdit',
+    component:()=>import('@/views/trainAdmin/TrainEdit')
   }
 ]
 

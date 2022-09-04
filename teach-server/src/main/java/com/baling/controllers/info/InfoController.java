@@ -4,12 +4,16 @@ import com.baling.models.administration.City;
 import com.baling.models.administration.Company;
 import com.baling.models.administration.Country;
 import com.baling.models.administration.Station;
+import com.baling.models.train.Coach;
+import com.baling.models.train.TrainType;
 import com.baling.payload.request.DataRequest;
 import com.baling.payload.response.DataResponse;
 import com.baling.repository.administration.CityRepository;
 import com.baling.repository.administration.CompanyRepository;
 import com.baling.repository.administration.CountryRepository;
 import com.baling.repository.administration.StationRepository;
+import com.baling.repository.train.CoachRepository;
+import com.baling.repository.train.TrainTypeRepository;
 import com.baling.util.CommonMethod;
 import com.baling.util.DataProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +39,33 @@ public class InfoController {
     StationRepository stationRepository;
     @Autowired
     CityRepository cityRepository;
+    @Autowired
+    CoachRepository coachRepository;
+    @Autowired
+    TrainTypeRepository trainTypeRepository;
 
+
+    @PostMapping("/coach")
+    public DataResponse coach(@Valid @RequestBody DataRequest dataRequest){
+        List<Coach> coaches=coachRepository.findAll();
+        List data=new ArrayList();
+        for(Coach c:coaches){
+            Map m=new HashMap();
+            m.put("id",c.getId());
+            m.put("name",c.getName());
+            data.add(m);
+        }
+        return CommonMethod.getReturnData(data);
+    }
+
+    @PostMapping("/trainType")
+    public DataResponse trainType(@Valid @RequestBody DataRequest dataRequest){
+        List<TrainType> trainTypes=trainTypeRepository.findAll();
+        List data=new ArrayList();
+        for(TrainType tt:trainTypes)
+            data.add(CommonMethod.convertToMap(tt));
+        return CommonMethod.getReturnData(data);
+    }
 
     @PostMapping("/country")
     public DataResponse country(@Valid @RequestBody DataRequest dataRequest){

@@ -32,7 +32,6 @@
         <el-button size="small" @click="doEdit(scope.row.id)">编辑</el-button>
       </template>
     </el-table-column>
-
   </el-table>
 
 

@@ -134,6 +134,8 @@ export default {
         if(seats[i].type==='order'&&seats[i].total==null)noTotal=true;
       }
       var flag=true;
+      if(!this.coachId){flag=false;ElMessage.error('请输入编号');}
+      if(!this.form.name){flag=false;ElMessage.error('请输入名称');}
       if(noId){flag=false;ElMessage.error('请选择所有坐席');}
       if(noType){flag=false;ElMessage.error('请选择所有坐席种类');}
       if(noTotal){flag=false;ElMessage.error('请为顺序编号席分配数量');}

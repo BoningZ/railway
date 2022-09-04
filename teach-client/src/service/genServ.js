@@ -79,6 +79,12 @@ function getCountries(data){
 function getCompanies(data){
     return generalRequest('api/info/company',data);
 }
+function getTrainTypes(data){
+    return generalRequest('/api/info/trainType',data)
+}
+function getCoaches(data){
+    return generalRequest('/api/info/coach',data)
+}
 function getStations(data){
     return generalRequest('/api/info/station',data);
 }
@@ -142,6 +148,15 @@ function getCoachInfo(data){
 function submitCoach(data){
     return generalRequest('/api/coach/submitCoach',data)
 }
+function getTrainTable(data){
+    return generalRequest('/api/train/getTrainTable',data)
+}
+function getTrainInfo(data){
+    return generalRequest('/api/train/getTrainInfo',data)
+}
+function submitTrain(data){
+    return generalRequest('/api/train/submitTrain',data)
+}
 
 //  company
 
@@ -187,5 +202,10 @@ export {
     newSeat,
     getCoachTable,
     getCoachInfo,
-    submitCoach
+    submitCoach,
+    getTrainInfo,
+    getTrainTable,
+    submitTrain,
+    getCoaches,
+    getTrainTypes
 }
