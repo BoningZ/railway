@@ -92,6 +92,26 @@ const routes = [
     path: '/TrainEdit',
     name:'TrainEdit',
     component:()=>import('@/views/trainAdmin/TrainEdit')
+  },
+  {
+    path: '/LineTable',
+    name:'LineTable',
+    component:()=>import('@/views/lineAdmin/LineTable')
+  },
+  {
+    path: '/LineEditStopping',
+    name:'LineEditStopping',
+    component:()=>import('@/views/lineAdmin/LineEditStopping')
+  },
+  {
+    path: '/LineEditDeparture',
+    name:'LineEditDeparture',
+    component:()=>import('@/views/lineAdmin/LineEditDeparture')
+  },
+  {
+    path: '/LineEditPrice',
+    name:'LineEditPrice',
+    component:()=>import('@/views/lineAdmin/LineEditPrice')
   }
 ]
 

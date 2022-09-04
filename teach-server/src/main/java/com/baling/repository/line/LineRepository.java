@@ -19,5 +19,8 @@ public interface LineRepository extends JpaRepository<Line,String> {
     @Query(value = "select * from line where id in (select line_id from stopping stp where station_id in (select id from station where city_id=?1) and order_in_line<some(select order_in_line from stopping where line_id=stp.line_id and station_id =?2))",nativeQuery = true)
     List<Line> findFromCityToStation(String from,String to);
 
+    @Query(value = "select * from line where (id like ?1 or name like ?1) and company_id=?2 limit 30",nativeQuery = true)
+    List<Line> findTopHundredByFeatureLikeAndCompany(String feature,String companyId);
+
 
 }

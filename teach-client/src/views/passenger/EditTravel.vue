@@ -8,7 +8,7 @@
           <el-tag size="large" type="info" v-show="item.status==='QUEUEING'">{{"行程"+(index+1)+":候补中"}}</el-tag>
           <el-tag size="large" type="success" v-show="item.status==='SUCCEEDED'">{{"行程"+(index+1)+":成功 "+item.price.toFixed(2)+"元"}}</el-tag>
           <el-tag size="large" type="danger" v-show="(item.status==='SUCCEEDED'||item.status==='QUEUEING')&&item.altered>0">{{"改签次数："+item.altered}}</el-tag>
-          <el-tag size="large" type="warning" v-show="item.status==='CANCELED'">{{"行程"+(index+1)+":被取消"}}</el-tag>
+          <el-tag size="large" type="warning" v-show="item.status==='CANCELED'">{{"行程"+(index+1)+":调度变更"}}</el-tag>
           <el-tag size="large"  v-show="item.status==='REFUNDED'">{{"行程"+(index+1)+":已退款"}}</el-tag>
           <el-tag size="large"  v-show="item.status==='USED'">{{"行程"+(index+1)+":已使用"}}</el-tag>
         </el-col>
@@ -75,12 +75,12 @@
         <div v-show="item.status==='QUEUEING'">
         <el-tag type="info" size="large">候补中</el-tag>
       </div>
-        <div v-show="item.status==='SUCCEEDED'||item.status==='QUEUEING'">
+        <div v-show="item.status==='SUCCEEDED'||item.status==='QUEUEING'||item.status==='CANCELED'">
           <el-divider/>
           <el-row style="margin-top: 10px">
             <el-col :span="16"></el-col>
             <el-col :span="4">
-              <el-button type="warning" size="large" style="width: 80%;" @click="alter(item.id)" plain>改签</el-button>
+              <el-button type="warning" size="large" style="width: 80%;" @click="alter(item.id)" plain v-show="item.status!=='CANCELED'">改签</el-button>
             </el-col>
             <el-col :span="4">
               <el-button type="danger" size="large" style="width: 80%;" @click="refund(item.id)" plain>退票</el-button>

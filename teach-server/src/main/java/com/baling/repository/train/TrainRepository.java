@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TrainRepository extends JpaRepository<Train,String> {
     List<Train> findByIdLike(String id);
+    List<Train> findByNameLike(String name);
 }

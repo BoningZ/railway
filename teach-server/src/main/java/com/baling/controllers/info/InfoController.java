@@ -5,7 +5,9 @@ import com.baling.models.administration.Company;
 import com.baling.models.administration.Country;
 import com.baling.models.administration.Station;
 import com.baling.models.train.Coach;
+import com.baling.models.train.Train;
 import com.baling.models.train.TrainType;
+import com.baling.models.user.Driver;
 import com.baling.payload.request.DataRequest;
 import com.baling.payload.response.DataResponse;
 import com.baling.repository.administration.CityRepository;
@@ -13,7 +15,9 @@ import com.baling.repository.administration.CompanyRepository;
 import com.baling.repository.administration.CountryRepository;
 import com.baling.repository.administration.StationRepository;
 import com.baling.repository.train.CoachRepository;
+import com.baling.repository.train.TrainRepository;
 import com.baling.repository.train.TrainTypeRepository;
+import com.baling.repository.user.DriverRepository;
 import com.baling.util.CommonMethod;
 import com.baling.util.DataProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,10 @@ public class InfoController {
     CoachRepository coachRepository;
     @Autowired
     TrainTypeRepository trainTypeRepository;
+    @Autowired
+    TrainRepository trainRepository;
+    @Autowired
+    DriverRepository driverRepository;
 
 
     @PostMapping("/coach")
@@ -108,6 +116,14 @@ public class InfoController {
             data.add(CommonMethod.convertToMap(s));
         return CommonMethod.getReturnData(data);
     }
+    @PostMapping("/driver")
+    public DataResponse driver(@Valid @RequestBody DataRequest dataRequest){
+        List<Driver> drivers=driverRepository.findAll();
+        List data=new ArrayList();
+        for(Driver s:drivers)
+            data.add(CommonMethod.convertToMap(s));
+        return CommonMethod.getReturnData(data);
+    }
 
     @PostMapping("/stationLike")
     public DataResponse stationLike(@Valid @RequestBody DataRequest dataRequest){
@@ -116,6 +132,20 @@ public class InfoController {
         List data=new ArrayList();
         for(Station s:stations)
             data.add(CommonMethod.convertToMap(s));
+        return CommonMethod.getReturnData(data);
+    }
+
+    @PostMapping("/trainLike")
+    public DataResponse trainLike(@Valid @RequestBody DataRequest dataRequest){
+        String name=dataRequest.getString("name");
+        List<Train> trains=trainRepository.findByNameLike("%"+name+"%");
+        List data=new ArrayList();
+        for(Train t:trains){
+            Map m=new HashMap();
+            m.put("id",t.getId());
+            m.put("name",t.getName());
+            data.add(m);
+        }
         return CommonMethod.getReturnData(data);
     }
 

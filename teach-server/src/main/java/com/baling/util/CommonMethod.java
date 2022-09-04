@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -189,6 +191,26 @@ public class CommonMethod {
 
     public static double priceFormula(double kLine,double bLine,double kSeat,double bSeat,double bStop){
         return kLine*(kSeat*bStop+bSeat)+bLine;
+    }
+
+    public static Date toSqlDate(Object obj){
+        try {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            java.util.Date date = format.parse((String) obj);
+            return new java.sql.Date(date.getTime());
+        }catch (Exception e){        try {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            java.util.Date date = format.parse((String) obj);
+            return new java.sql.Date(date.getTime());
+        }catch (Exception ee){return null;}}
+    }
+
+    public static double parseNum(Object obj){
+        try{
+            return ((Double)obj);
+        }catch (Exception e){return (Integer)obj;}
     }
 
 

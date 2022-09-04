@@ -85,6 +85,12 @@ function getTrainTypes(data){
 function getCoaches(data){
     return generalRequest('/api/info/coach',data)
 }
+function getTrainsLike(data){
+    return generalRequest('/api/info/trainLike',data)
+}
+function getDrivers(data){
+    return generalRequest('/api/info/driver',data)
+}
 function getStations(data){
     return generalRequest('/api/info/station',data);
 }
@@ -157,6 +163,22 @@ function getTrainInfo(data){
 function submitTrain(data){
     return generalRequest('/api/train/submitTrain',data)
 }
+function getLineInfo(data){
+    return generalRequest('/api/line/getLineInfo',data)
+}
+function getLineTable(data){
+    return generalRequest('/api/line/getLineTable',data)
+}
+function submitLineStopping(data){
+    return generalRequest('/api/line/submitLineStopping',data)
+}
+function submitLineDeparture(data){
+    return generalRequest('/api/line/submitLineDeparture',data)
+}
+function submitLinePrice(data){
+    return generalRequest('/api/line/submitLinePrice',data)
+}
+
 
 //  company
 
@@ -207,5 +229,12 @@ export {
     getTrainTable,
     submitTrain,
     getCoaches,
-    getTrainTypes
+    getTrainTypes,
+    getLineInfo,
+    getLineTable,
+    submitLineStopping,
+    submitLinePrice,
+    submitLineDeparture,
+    getTrainsLike,
+    getDrivers
 }
