@@ -205,6 +205,9 @@ function submitHolidaySelect(data){
 function getHolidayList(data){
     return generalRequest('/api/holiday/getList',data)
 }
+function getTravelTrace(data){
+    return generalRequest('/api/travel/trace',data)
+}
 
 //  company
 
@@ -271,5 +274,6 @@ export {
     deleteRefund,
     newHoliday,
     submitHolidaySelect,
-    getHolidayList
+    getHolidayList,
+    getTravelTrace
 }

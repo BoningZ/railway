@@ -8,6 +8,7 @@
     <el-table-column label="查看">
       <template #default="scope">
         <el-button size="small" @click="goTravel(scope.row.id)">查看</el-button>
+        <el-button size="small" type="primary" @click="trace(scope.row.id)">轨迹</el-button>
       </template>
     </el-table-column>
     <el-table-column type="expand">
@@ -60,6 +61,9 @@ export default {
     },
     goTravel(id){
       this.$router.push({path:'/EditTravel',query:{travelId:id}})
+    },
+    trace(id){
+      this.$router.push({path:'/ShowTravel',query:{travelId:id}})
     }
   }
 }

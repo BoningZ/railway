@@ -1,5 +1,11 @@
 const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
+  configureWebpack(config) {
+    // ...
+    config.externals = {
+      'BMap':'BMap' // 高德地图配置
+    }
+  },
   devServer: {
     hot: true,
     disableHostCheck: true,

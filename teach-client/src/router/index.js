@@ -127,6 +127,11 @@ const routes = [
     path: '/Holiday',
     name:'Holiday',
     component:()=>import('@/views/country/Holiday')
+  },
+  {
+    path: '/ShowTravel',
+    name:'ShowTravel',
+    component:()=>import('@/views/passenger/ShowTravel')
   }
 ]
 
