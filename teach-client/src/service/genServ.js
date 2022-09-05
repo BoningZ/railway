@@ -178,6 +178,9 @@ function submitLineDeparture(data){
 function submitLinePrice(data){
     return generalRequest('/api/line/submitLinePrice',data)
 }
+function getSalesStat(data){
+    return generalRequest('/api/sales/stat',data)
+}
 
 
 //  company
@@ -236,5 +239,6 @@ export {
     submitLinePrice,
     submitLineDeparture,
     getTrainsLike,
-    getDrivers
+    getDrivers,
+    getSalesStat
 }

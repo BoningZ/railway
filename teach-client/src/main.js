@@ -7,19 +7,19 @@ import 'element-plus/lib/theme-chalk/index.css';
 
 
 router.beforeEach((to, from, next) => {
-    //·ÃÎÊÏÞÖÆÒ³ÃæÊ± ÖØ¶¨ÏòÖÁµÇÂ¼Ò³Ãæ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½Ê± ï¿½Ø¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼Ò³ï¿½ï¿½
     const publicPages = ['/login','/Register'];
     const authRequired = !publicPages.includes(to.path);
-    
+
     var loggedIn = store.state.loggedIn
-  
+
     if (authRequired && !loggedIn) {
       return next('/login');
     }
-  
+
     next();
   })
-  
+
 
 createApp(App)
 .use(ElementPlus)

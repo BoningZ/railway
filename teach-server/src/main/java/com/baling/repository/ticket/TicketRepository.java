@@ -1,6 +1,7 @@
 package com.baling.repository.ticket;
 
 import com.baling.models.line.Departure;
+import com.baling.models.line.Line;
 import com.baling.models.ticket.Ticket;
 import com.baling.models.ticket.TicketStatus;
 import com.baling.models.ticket.Travel;
@@ -20,4 +21,5 @@ public interface TicketRepository extends JpaRepository<Ticket,String> {
 
     @Query(value = "select * from ticket where departure_id in (select id from departure where line_id=?1) and ticket_status_id=?2",nativeQuery = true)
     List<Ticket> findByLineAndTicketStatus(String lineId,int ticketStatusId);
+    List<Ticket> findByDepartureAndTicketStatusAndStartDateBetween(Departure departure,TicketStatus ticketStatus,Date date1,Date date2);
 }

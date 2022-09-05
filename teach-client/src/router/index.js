@@ -112,6 +112,11 @@ const routes = [
     path: '/LineEditPrice',
     name:'LineEditPrice',
     component:()=>import('@/views/lineAdmin/LineEditPrice')
+  },
+  {
+    path: '/SalesStat',
+        name:'SalesStat',
+      component:()=>import('@/views/sales/SalesStat')
   }
 ]
 
