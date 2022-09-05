@@ -196,6 +196,15 @@ function getAlter(data){
 function getRefund(data){
     return generalRequest('/api/policy/getRefund',data)
 }
+function newHoliday(data){
+    return generalRequest('/api/holiday/newHoliday',data)
+}
+function submitHolidaySelect(data){
+    return generalRequest('/api/holiday/submitSelect',data)
+}
+function getHolidayList(data){
+    return generalRequest('/api/holiday/getList',data)
+}
 
 //  company
 
@@ -259,5 +268,8 @@ export {
     getAlter,
     submitRefund,
     submitAlter,
-    deleteRefund
+    deleteRefund,
+    newHoliday,
+    submitHolidaySelect,
+    getHolidayList
 }

@@ -122,6 +122,11 @@ const routes = [
     path: '/AlterRefundPolicy',
     name:'AlterRefundPolicy',
     component:()=>import('@/views/sales/AlterRefundPolicy')
+  },
+  {
+    path: '/Holiday',
+    name:'Holiday',
+    component:()=>import('@/views/country/Holiday')
   }
 ]
 

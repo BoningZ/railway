@@ -107,13 +107,18 @@ public class DataRequest {
         }
     }
     public java.sql.Date getDate(String key)  {
+        Object obj=data.get(key);
         try {
-            Object obj = data.get(key);
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date date = format.parse((String) obj);
+            java.util.Date date = format.parse((String) obj);
             return new java.sql.Date(date.getTime());
-        }catch (Exception e){return null;}
+        }catch (Exception e){        try {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+            format.setTimeZone(TimeZone.getTimeZone("UTC"));
+            java.util.Date date = format.parse((String) obj);
+            return new java.sql.Date(date.getTime());
+        }catch (Exception ee){return null;}}
     }
     public Time getTime(String key) {
         return null;
