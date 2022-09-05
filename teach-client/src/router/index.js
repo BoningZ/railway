@@ -115,8 +115,13 @@ const routes = [
   },
   {
     path: '/SalesStat',
-        name:'SalesStat',
-      component:()=>import('@/views/sales/SalesStat')
+    name:'SalesStat',
+    component:()=>import('@/views/sales/SalesStat')
+  },
+  {
+    path: '/AlterRefundPolicy',
+    name:'AlterRefundPolicy',
+    component:()=>import('@/views/sales/AlterRefundPolicy')
   }
 ]
 

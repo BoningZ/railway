@@ -181,7 +181,21 @@ function submitLinePrice(data){
 function getSalesStat(data){
     return generalRequest('/api/sales/stat',data)
 }
-
+function submitRefund(data){
+    return generalRequest('/api/policy/submitRefund',data)
+}
+function submitAlter(data){
+    return generalRequest('/api/policy/submitAlter',data)
+}
+function deleteRefund(data){
+    return generalRequest('/api/policy/deleteRefund',data)
+}
+function getAlter(data){
+    return generalRequest('/api/policy/getAlter',data)
+}
+function getRefund(data){
+    return generalRequest('/api/policy/getRefund',data)
+}
 
 //  company
 
@@ -240,5 +254,10 @@ export {
     submitLineDeparture,
     getTrainsLike,
     getDrivers,
-    getSalesStat
+    getSalesStat,
+    getRefund,
+    getAlter,
+    submitRefund,
+    submitAlter,
+    deleteRefund
 }

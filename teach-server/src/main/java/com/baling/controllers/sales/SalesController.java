@@ -1,6 +1,7 @@
 package com.baling.controllers.sales;
 
 import com.baling.models.administration.Company;
+import com.baling.models.administration.Currency;
 import com.baling.models.line.Departure;
 import com.baling.models.line.Line;
 import com.baling.models.line.Stopping;
@@ -74,6 +75,7 @@ public class SalesController {
             for(Seat s:seats)seatPriceMapLine.put(s,0.0);
             List<String> stations=new ArrayList<>();
             List<Stopping> stoppings=stoppingRepository.findByLineOrderByOrderInLine(line);
+            Currency currency=stoppings.size()==0?null:stoppings.get(0).getStation().getCity().getProvince().getCountry().getCurrency();
             for(Stopping s:stoppings)stations.add(s.getStation().getName());
             lineM.put("stations",stations);
             int stationCount=stations.size();
@@ -117,8 +119,9 @@ public class SalesController {
                         seatDetailM.get(vs)[v.getStart()]++;
                         seatDetailM.get(vs)[v.getEnd()+1]--;
                         seatCountMapLine.replace(vs,seatCountMapLine.get(vs)+1);
-                        seatPriceMapLine.replace(vs,seatPriceMapLine.get(vs)+v.getPrice());
-                        count++; price+=v.getPrice();
+                        double realPrice=v.getPriceInCurrency(currency);
+                        seatPriceMapLine.replace(vs,seatPriceMapLine.get(vs)+realPrice);
+                        count++; price+=realPrice;
                     }
                     if (seatDetailM != null) {
                         List seatDetail=new ArrayList();
@@ -144,10 +147,11 @@ public class SalesController {
                 Map tmp=new HashMap();
                 tmp.put("name",s.getName());
                 tmp.put("num",seatCountMapLine.get(s));
-                seatPrices.add(tmp);
+                seatCounts.add(tmp);
+                tmp=new HashMap();
                 tmp.put("name",s.getName());
                 tmp.put("num",seatPriceMapLine.get(s));
-                seatCounts.add(tmp);
+                seatPrices.add(tmp);
             }
             lineM.put("seats",seatName);
             lineM.put("seatPrices",seatPrices);

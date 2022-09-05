@@ -1,5 +1,6 @@
 package com.baling.models.ticket;
 
+import com.baling.models.administration.Currency;
 import com.baling.models.line.Departure;
 import com.baling.models.train.Seat;
 import org.hibernate.annotations.Where;
@@ -62,6 +63,10 @@ public class Ticket implements Cloneable{
 
     @NotNull
     private int orderInTravel;
+
+    public double getPriceInCurrency(Currency currency){
+        return this.travel.getPassenger().getCountry().getCurrency().toAnother(currency,price);
+    }
 
     public Ticket clone(){
         try {

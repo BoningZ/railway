@@ -7,6 +7,7 @@
     <el-form-item label="日期范围">
       <el-date-picker
                       v-model="form.dateRange" type="daterange"
+                      size="small"
                       range-separator="至"
                       start-placeholder="开始时间"
                       end-placeholder="结束时间"/>
@@ -49,13 +50,13 @@
     </el-table-column>
     <el-table-column type="expand" >
       <template #default="scope">
-        <el-table :data="scope.row.details" style="width: 90%;margin-top: 5px;margin-left: 5%;">
+        <el-table :data="scope.row.details" style="width: 95%;margin-top: 5px;margin-left: 2%;" >
           <el-table-column prop="startDate" label="发车日期"/>
           <el-table-column prop="startTime" label="发车时间"/>
-          <el-table-column type="expand" >
+          <el-table-column type="expand" @click="this.$nextTick(()=>doPaint)">
             <template #default="scope2">
               <div>
-                <div :id="scope2.row.departureId+scope2.row.startTime"/>
+                <div :id="scope2.row.departureId+scope2.row.startTime" style="width: 100%;height:300px" ></div>
               </div>
             </template>
           </el-table-column>
@@ -68,7 +69,7 @@
 
 <script>
 import Navi from '@/components/Navi'
-import echarts from "echarts";
+import * as echarts from 'echarts';
 import {getSalesStat} from "@/service/genServ";
 export default {
   name:"SalesStat",
@@ -85,36 +86,47 @@ export default {
   created() {
     this.doQuery()
   },
+  mounted() {
+    this.timer = setInterval(this.doPaint, 1000);
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
+  },
   methods:{
     doQuery(){
       getSalesStat({'lineId':this.form.lineId,'start':this.form.dateRange[0],'end':this.form.dateRange[1]}).then(res=>{
         this.dataList=res.data
-        var list=this.dataList
-        for(var i=0;i<list.length;i++){
-          for(var j=0;j<list[i].details.length;j++){
-            var cur=list[i].details[j];
-            var chartDom= document.getElementById(cur.departureId+cur.startTime);
-            var wrapper=[];
-            for(var k=0;k<cur.seatDetail.length;k++)wrapper[k]={
-              name: list[i].seats[k],type: 'line',stack: 'Total',areaStyle: {},
+      })
+    },
+    doPaint(){
+      var list=this.dataList
+      for(var i=0;i<list.length;i++){
+        for(var j=0;j<list[i].details.length;j++){
+          try {
+            var cur = list[i].details[j];
+            var chartDom = document.getElementById(cur.departureId + cur.startTime);
+            var wrapper = [];
+            for (var k = 0; k < cur.seatDetail.length; k++) wrapper[k] = {
+              name: list[i].seats[k], type: 'line', stack: 'Total', areaStyle: {},
               emphasis: {focus: 'series'},
               data: cur.seatDetail[k]
             }
-            var myChart=echarts.init(chartDom);
+            var myChart = echarts.init(chartDom);
             var option = {
               title: {text: '单次发车统计'},
-              tooltip: {trigger: 'axis',axisPointer: {type: 'cross',label: { backgroundColor: '#6a7985'}}},
+              tooltip: {trigger: 'axis', axisPointer: {type: 'cross', label: {backgroundColor: '#6a7985'}}},
               legend: {data: list[i].seats},
               toolbox: {feature: {saveAsImage: {}}},
-              grid: {left: '3%',right: '4%',bottom: '3%',containLabel: true},
-              xAxis: [{type: 'category',boundaryGap: false,data: list[i].stations}],
+              grid: {left: '3%', right: '4%', bottom: '3%', containLabel: true},
+              xAxis: [{type: 'category', boundaryGap: false, data: list[i].stations}],
               yAxis: [{type: 'value'}],
               series: wrapper
             };
             option && myChart.setOption(option);
-          }
+            // eslint-disable-next-line no-empty
+          }catch (e) {}
         }
-      })
+      }
     }
   }
 }
