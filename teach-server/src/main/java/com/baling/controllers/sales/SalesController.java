@@ -95,6 +95,7 @@ public class SalesController {
                     Map<Seat,int[]> seatDetailM=null;
                     for(Ticket v:valid){
                         if(!v.getStartDate().equals(curStart)||valid.indexOf(v)==0){
+                            curStart=v.getStartDate();
                             if (seatDetailM != null) {
                                 List seatDetail=new ArrayList();
                                 for(Seat s:seats){
@@ -110,6 +111,7 @@ public class SalesController {
                                 details.add(detailM);
                             }
                             detailM=new HashMap();
+                            for(Seat s:seats)seatStationTemplate.replace(s,new int[stationCount+2]);
                             seatDetailM=new HashMap<>(seatStationTemplate);
                             detailM.put("startDate",v.getStartDate());
                             detailM.put("departureId",d.getId());

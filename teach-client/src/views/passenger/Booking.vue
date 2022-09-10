@@ -259,6 +259,10 @@ export default {
       }else this.resultsTo=[];
     },
     doQuery(){
+      if(!this.startDate||!this.fromForm.fromId||!this.toForm.toId){ElMessage.error('请选择起始站及时间！');return;}
+      var dateTime=new Date();
+      if(new Date(dateTime.setDate((new Date).getDate()-1))>this.startDate){ElMessage.error('请选择今天之后的日期！');return;}
+      if(new Date(dateTime.setDate((new Date).getDate()+21))<this.startDate){ElMessage.error('请选择三周以内的日期！');return;}
       this.loadingTable=true;
       queryRoute({
         'fromRange':this.fromForm.fromRange,

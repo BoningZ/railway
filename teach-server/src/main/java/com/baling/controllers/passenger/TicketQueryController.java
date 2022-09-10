@@ -136,7 +136,7 @@ public class TicketQueryController {
         travelRepository.save(travel);
         for(int i=0;i<route.departureList.size();i++){
             Ticket ticket=new Ticket();
-            ticket.setId((cur.getId().substring(0,4)+(new java.util.Date()).toString().substring(12,14)+route.departureList.get(i).getId().substring(3)+"endOfQuoteRndOfQuoteEndOfQuote").substring(0,19).replace(' ','-'));
+            ticket.setId((cur.getId().substring(0,4)+(new java.util.Date()).toString().substring(7,14)+route.departureList.get(i).getId().substring(3)+"endOfQuoteRndOfQuoteEndOfQuote").substring(0,19).replace(' ','-'));
             ticket.setTravel(travel);
             ticket.setTicketStatus(ticketStatusRepository.getByName(ETicketStatus.UNPAID));
             ticket.setAltered(0);
@@ -192,7 +192,8 @@ public class TicketQueryController {
             int order=t.getOrderInTravel();
 
             Currency tCurrency=t.getTravel().getPassenger().getCountry().getCurrency();
-            t.setPrice(tCurrency.equals(pCurrency)?priceList.get(order):pCurrency.toAnother(tCurrency,priceList.get(order)));
+            double price=CommonMethod.parseNum(priceList.get(order));
+            t.setPrice(tCurrency.equals(pCurrency)?price:pCurrency.toAnother(tCurrency,price));
 
             ETicketStatus result;
             if(assignForTicket(t,seatList.get(order),colList.get(order),0))result=ETicketStatus.SUCCEEDED;
@@ -522,8 +523,8 @@ public class TicketQueryController {
 
 
     //transfer algorithm
-    private final Comparator<DepartureNStopping> moneyPri= (o1, o2) -> (int) (o2.moneySpent()-o1.moneySpent()),
-                                                 timePri= (o1, o2) -> (int) (o2.timeSpent()-o1.timeSpent());
+    private final Comparator<DepartureNStopping> moneyPri= (o1, o2) -> (int) (o1.moneySpent()-o2.moneySpent()),
+                                                 timePri= (o1, o2) -> (int) (o1.timeSpent()-o2.timeSpent());
     private final static int MAX_TRANSFER=3,MAX_ROUTES=30,MAX_TRANS_TIME=240,MIN_IN_CITY=60;
     private List<Line> lineVisited=new ArrayList<>();
     private Map<Station,Integer> toDest=new HashMap<>();//distance to destination
@@ -582,7 +583,7 @@ public class TicketQueryController {
         if(okOne==null)return res;
         List<DepartureNStopping> nxt;
         nxt=fromCity?getValidDepartureInCity(okOne,startDate,startTime*60,24*60):getValidDeparture(from.get(0),startDate,startTime*60,24*60);
-        nxt.sort(priMoney?timePri:moneyPri);
+        nxt.sort(priMoney?moneyPri:timePri);
         for(DepartureNStopping ds:nxt){
             if(routeFound>MAX_ROUTES)break;
             Stopping start=ds.start,end=ds.stopping; Departure dep=ds.departure;
@@ -598,7 +599,7 @@ public class TicketQueryController {
         Stopping last=route.getLastEnd();
         List<DepartureNStopping> nxt=allowedInCity?getValidDepartureInCity(last.getStation(),CommonMethod.addByDay(startDate,route.daySpent),route.minSpent,route.minSpent+MAX_TRANS_TIME):
                 getValidDeparture(last.getStation(),CommonMethod.addByDay(startDate,route.daySpent),route.minSpent,route.minSpent+MAX_TRANS_TIME);
-        nxt.sort(priMoney?timePri:moneyPri);
+        nxt.sort(priMoney?moneyPri:timePri);
         for(DepartureNStopping ds:nxt){
             Stopping start=ds.start,end=ds.stopping; Departure dep=ds.departure;
             Route tmp=new Route(route);
@@ -647,7 +648,7 @@ public class TicketQueryController {
                     int curMin = (d.getStart() + cur.getArrival()) % (24 * 60);
                     if (curMin >= startMin && curMin <= endMin){
                         //lineVisited.add(l);
-                        res.add(new DepartureNStopping(d,CommonMethod.addByDay(date,-(d.getStart()+stp.getArrival())/(24*60)),stp,cur));
+                        res.add(new DepartureNStopping(d,CommonMethod.addByDay(date,-(d.getStart()+cur.getArrival())/(24*60)),stp,cur));
                     }
                 }
             }

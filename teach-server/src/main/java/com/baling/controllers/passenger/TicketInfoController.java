@@ -63,6 +63,7 @@ public class TicketInfoController {
                 Map ticketMap=new HashMap();
                 Line curLine=ticket.getDeparture().getLine();
                 ticketMap.put("from",stoppingRepository.findByLineAndOrderInLine(curLine,ticket.getStart()).getStation().getName());
+                ticketMap.put("name",curLine.getName());
                 ticketMap.put("to",stoppingRepository.findByLineAndOrderInLine(curLine,ticket.getEnd()).getStation().getName());
                 ticketMap.put("status",ticket.getTicketStatus().getName());
                 ticketMap.put("seat",ticket.getSeat().getName()+" "+ticket.getCoachNum()+"车 "+ticket.getRowPosition()+ticket.getCol());

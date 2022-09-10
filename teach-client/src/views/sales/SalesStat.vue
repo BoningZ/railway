@@ -50,13 +50,13 @@
     </el-table-column>
     <el-table-column type="expand" >
       <template #default="scope">
-        <el-table :data="scope.row.details" style="width: 95%;margin-top: 5px;margin-left: 2%;" >
+        <el-table :data="scope.row.details" style="width: 95%;margin-top: 5px;margin-left: 2%;" @row-click="doPaint" >
           <el-table-column prop="startDate" label="发车日期"/>
           <el-table-column prop="startTime" label="发车时间"/>
-          <el-table-column type="expand" @click="this.$nextTick(()=>doPaint)">
+          <el-table-column type="expand" >
             <template #default="scope2">
               <div>
-                <div :id="scope2.row.departureId+scope2.row.startTime" style="width: 100%;height:300px" ></div>
+                <div :id="scope2.row.departureId+scope2.row.startTime+scope2.row.startDate" style="width: 100%;height:300px" ></div>
               </div>
             </template>
           </el-table-column>
@@ -83,15 +83,6 @@ export default {
       dataList:[]
     }
   },
-  created() {
-    this.doQuery()
-  },
-  mounted() {
-    this.timer = setInterval(this.doPaint, 1000);
-  },
-  beforeUnmount() {
-    clearInterval(this.timer);
-  },
   methods:{
     doQuery(){
       getSalesStat({'lineId':this.form.lineId,'start':this.form.dateRange[0],'end':this.form.dateRange[1]}).then(res=>{
@@ -104,14 +95,14 @@ export default {
         for(var j=0;j<list[i].details.length;j++){
           try {
             var cur = list[i].details[j];
-            var chartDom = document.getElementById(cur.departureId + cur.startTime);
+            var chartDom = document.getElementById(cur.departureId + cur.startTime+cur.startDate);
+            var myChart = echarts.init(chartDom);
             var wrapper = [];
             for (var k = 0; k < cur.seatDetail.length; k++) wrapper[k] = {
               name: list[i].seats[k], type: 'line', stack: 'Total', areaStyle: {},
               emphasis: {focus: 'series'},
               data: cur.seatDetail[k]
             }
-            var myChart = echarts.init(chartDom);
             var option = {
               title: {text: '单次发车统计'},
               tooltip: {trigger: 'axis', axisPointer: {type: 'cross', label: {backgroundColor: '#6a7985'}}},
@@ -120,9 +111,9 @@ export default {
               grid: {left: '3%', right: '4%', bottom: '3%', containLabel: true},
               xAxis: [{type: 'category', boundaryGap: false, data: list[i].stations}],
               yAxis: [{type: 'value'}],
-              series: wrapper
+              series: JSON.parse(JSON.stringify(wrapper))
             };
-            option && myChart.setOption(option);
+            option && myChart.setOption(JSON.parse(JSON.stringify(option)));
             // eslint-disable-next-line no-empty
           }catch (e) {}
         }

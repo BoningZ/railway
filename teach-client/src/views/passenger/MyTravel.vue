@@ -16,6 +16,7 @@
         <el-table :data="props.row.ticket" style="width: 60%;margin-left: 20%" border>
           <el-table-column prop="from" label="出发站"/>
           <el-table-column prop="to" label="到达站"/>
+          <el-table-column prop="name" label="路线"/>
           <el-table-column label="状态">
             <template #default="props3">
               <el-tag size="large" type="danger" v-show="props3.row.status==='UNPAID'">未支付</el-tag>

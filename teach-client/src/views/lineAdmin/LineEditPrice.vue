@@ -35,12 +35,12 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="danger" @click="deletePrice(index)" >删除计划外</el-button>
+        <el-button type="danger" @click="deletePrice(index)" >删除价格政策</el-button>
       </el-form-item>
     </el-form>
     <el-divider/>
     <el-form-item>
-      <el-button type="success" @click="addPrice">添加计划外</el-button>
+      <el-button type="success" @click="addPrice">添加价格政策</el-button>
     </el-form-item>
 
     <el-divider/>

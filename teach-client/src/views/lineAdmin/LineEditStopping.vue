@@ -33,7 +33,7 @@
     <el-form v-for="(stopping,index) in form.stoppings" v-bind:key="stopping" :data="stopping">
       <el-divider/>
       <el-form-item label="车站">
-        <el-select style="width: 75%" filterable v-model="stopping.stationId"
+        <el-select style="width: 75%" filterable v-model="stopping.stationId" :disabled="!form.rescheduled"
                    remote
                    reserve-keyword
                    placeholder="请输入车站名"
