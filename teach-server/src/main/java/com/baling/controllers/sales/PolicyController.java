@@ -40,7 +40,7 @@ public class PolicyController {
     public DataResponse submitRefund(@Valid @RequestBody DataRequest dataRequest) {
         Company company = adminCompanyRepository.getByUser(userRepository.findByUserId(CommonMethod.getUserId()).get()).getCompany();
         Double hour=CommonMethod.parseNum(dataRequest.get("hour")); Double ratio=CommonMethod.parseNum(dataRequest.get("ratio"));
-        if(companyRefundRepository.existsByLeftHour(hour))return CommonMethod.getReturnMessageError("同一小时数只能有一个比率");
+        if(companyRefundRepository.existsByLeftHourAndCompany(hour,company))return CommonMethod.getReturnMessageError("同一小时数只能有一个比率");
         CompanyRefund companyRefund=new CompanyRefund();
         companyRefund.setLeftHour(hour); companyRefund.setRatio(ratio); companyRefund.setCompany(company); companyRefund.setId(company.getName()+String.format("-%.0f",hour));
         companyRefundRepository.save(companyRefund);

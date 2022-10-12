@@ -11,5 +11,5 @@ import java.util.List;
 public interface CoachSeatRepository extends JpaRepository<CoachSeat, Integer> {
     List<CoachSeat> findByCoach(Coach coach);
 
-    List<CoachSeat> findByCoachAndSeatAndAndColsContains(Coach coach, Seat seat,String cols);
+    List<CoachSeat> findByCoachAndSeatAndColsContains(Coach coach, Seat seat,String cols);
 }

@@ -11,5 +11,6 @@ import java.util.List;
 public interface CompanyRefundRepository extends JpaRepository<CompanyRefund, Integer> {
     List<CompanyRefund> findByCompanyOrderByLeftHour(Company company);
     Boolean existsByLeftHour(double leftHour);
+    Boolean existsByLeftHourAndCompany(double leftHour,Company company);
     List<CompanyRefund> findByLeftHourAndCompany(double leftHour,Company company);
 }

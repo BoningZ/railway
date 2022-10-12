@@ -478,7 +478,7 @@ public class TicketQueryController {
     }
     private int getAvailableRow(Ticket ticket,Seat seat,String col,int coachNum){
         Coach curCoach=trainCoachRepository.nativeFindByTrainIdAndPositionBit(ticket.getDeparture().getLine().getTrain().getId(),1<<(coachNum-1)).getCoach();
-        List<CoachSeat> coachSeat=coachSeatRepository.findByCoachAndSeatAndAndColsContains(curCoach,seat,col);
+        List<CoachSeat> coachSeat=coachSeatRepository.findByCoachAndSeatAndColsContains(curCoach,seat,col);
         List<Integer> availableRow=new ArrayList<>();
         for(CoachSeat cs:coachSeat)availableRow.addAll(CommonMethod.getNum(cs.getRowsPosition()));
         List<Ticket> tickets=ticketRepository.findByDepartureAndStartDateAndTicketStatusAndSeatAndColAndCoachNumAndStartLessThanAndEndGreaterThanOrderByRowPosition(ticket.getDeparture(),ticket.getStartDate(),ticketStatusRepository.getByName(ETicketStatus.SUCCEEDED),seat,col,coachNum,ticket.getEnd(),ticket.getStart());
